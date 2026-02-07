@@ -112,7 +112,7 @@ public class middleware_runtime_tests
     {
         var app = express.create();
         app.set("jsonp callback name", "cb");
-        app.get("/jsonp", (Action<Request, Response>)(static (_, res) => res.jsonp(new { ok = true })));
+        app.get("/jsonp", (Action<Request, Response>)(static (_, res) => res.jsonp(new Dictionary<string, object?> { ["ok"] = true })));
 
         var context = createContext("GET", "/jsonp");
         await app.handle(context, app);

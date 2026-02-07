@@ -1,7 +1,10 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
+using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.StaticFiles;
 
@@ -366,13 +369,92 @@ public class Response
 
     private static string serializeObject(object? body)
     {
-        if (body is null)
-            return "null";
+        using var stream = new MemoryStream();
+        using var writer = new Utf8JsonWriter(stream);
+        writeJsonValue(writer, body);
+        writer.Flush();
+        return Encoding.UTF8.GetString(stream.ToArray());
+    }
 
-#pragma warning disable IL2026
-#pragma warning disable IL3050
-        return System.Text.Json.JsonSerializer.Serialize(body);
-#pragma warning restore IL3050
-#pragma warning restore IL2026
+    private static void writeJsonValue(Utf8JsonWriter writer, object? value)
+    {
+        switch (value)
+        {
+            case null:
+                writer.WriteNullValue();
+                return;
+            case JsonElement element:
+                element.WriteTo(writer);
+                return;
+            case JsonDocument document:
+                document.RootElement.WriteTo(writer);
+                return;
+            case string text:
+                writer.WriteStringValue(text);
+                return;
+            case bool boolean:
+                writer.WriteBooleanValue(boolean);
+                return;
+            case byte number:
+                writer.WriteNumberValue(number);
+                return;
+            case sbyte number:
+                writer.WriteNumberValue(number);
+                return;
+            case short number:
+                writer.WriteNumberValue(number);
+                return;
+            case ushort number:
+                writer.WriteNumberValue(number);
+                return;
+            case int number:
+                writer.WriteNumberValue(number);
+                return;
+            case uint number:
+                writer.WriteNumberValue(number);
+                return;
+            case long number:
+                writer.WriteNumberValue(number);
+                return;
+            case ulong number:
+                writer.WriteNumberValue(number);
+                return;
+            case float number:
+                writer.WriteNumberValue(number);
+                return;
+            case double number:
+                writer.WriteNumberValue(number);
+                return;
+            case decimal number:
+                writer.WriteNumberValue(number);
+                return;
+            case Dictionary<string, object?> objectMap:
+                writer.WriteStartObject();
+                foreach (var kvp in objectMap)
+                {
+                    writer.WritePropertyName(kvp.Key);
+                    writeJsonValue(writer, kvp.Value);
+                }
+                writer.WriteEndObject();
+                return;
+            case IDictionary<string, string> stringMap:
+                writer.WriteStartObject();
+                foreach (var kvp in stringMap)
+                {
+                    writer.WritePropertyName(kvp.Key);
+                    writer.WriteStringValue(kvp.Value);
+                }
+                writer.WriteEndObject();
+                return;
+            case IEnumerable enumerable when value is not string:
+                writer.WriteStartArray();
+                foreach (var item in enumerable)
+                    writeJsonValue(writer, item);
+                writer.WriteEndArray();
+                return;
+            default:
+                writer.WriteStringValue(value.ToString());
+                return;
+        }
     }
 }

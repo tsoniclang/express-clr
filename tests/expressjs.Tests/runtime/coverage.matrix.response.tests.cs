@@ -44,7 +44,7 @@ public class coverage_matrix_response_tests
         Assert.Contains("filename=\"logo.png\"", res.get("Content-Disposition"));
         Assert.Equal("image/png", res.get("Content-Type"));
 
-        res.cookie("obj", new { a = 1 }, new CookieOptions { encode = static value => $"enc:{value}" });
+        res.cookie("obj", new Dictionary<string, object?> { ["a"] = 1 }, new CookieOptions { encode = static value => $"enc:{value}" });
         Assert.Contains("obj=enc:", res.get("Set-Cookie"));
 
         res.clearCookie("obj", new CookieOptions { path = "/admin" });
@@ -89,17 +89,17 @@ public class coverage_matrix_response_tests
         res.json("raw-json");
         Assert.Equal("application/json", res.get("Content-Type"));
 
-        res.json(new { ok = true });
+        res.json(new Dictionary<string, object?> { ["ok"] = true });
         Assert.Equal("application/json", res.get("Content-Type"));
 
         res.jsonp("raw-jsonp");
-        res.jsonp(new { ok = true });
+        res.jsonp(new Dictionary<string, object?> { ["ok"] = true });
         Assert.Equal("application/javascript", res.get("Content-Type"));
 
         var jsonpContext = test_runtime_utils.createContext("GET", "/");
         var jsonpRequest = Request.fromHttpContext(jsonpContext, app);
         var jsonpResponse = Response.fromHttpContext(jsonpContext, jsonpRequest);
-        jsonpResponse.jsonp(new { ok = true });
+        jsonpResponse.jsonp(new Dictionary<string, object?> { ["ok"] = true });
         Assert.StartsWith("cb(", test_runtime_utils.readBody(jsonpContext));
 
         res.links(new Dictionary<string, string> { ["next"] = "http://a", ["last"] = "http://b" });
@@ -216,7 +216,7 @@ public class coverage_matrix_response_tests
 
         var objectContext = test_runtime_utils.createContext("GET", "/");
         var objectRes = Response.fromHttpContext(objectContext, Request.fromHttpContext(objectContext, express.create()));
-        objectRes.send(new { value = 1 });
+        objectRes.send(new Dictionary<string, object?> { ["value"] = 1 });
         Assert.Equal("application/json", objectRes.get("Content-Type"));
 
         var nullContext = test_runtime_utils.createContext("GET", "/");

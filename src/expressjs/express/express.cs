@@ -32,11 +32,7 @@ public static class express
                 return;
             }
 
-#pragma warning disable IL2026
-#pragma warning disable IL3050
-            req.body = JsonSerializer.Deserialize<object>(body);
-#pragma warning restore IL3050
-#pragma warning restore IL2026
+            req.body = parseJsonBody(body);
             await next(null).ConfigureAwait(false);
         };
     }
@@ -173,5 +169,48 @@ public static class express
         if (req.context.Request.Body.CanSeek)
             req.context.Request.Body.Position = 0;
         return buffer.ToArray();
+    }
+
+    private static object? parseJsonBody(string body)
+    {
+        using var document = JsonDocument.Parse(body);
+        return mapJsonElement(document.RootElement);
+    }
+
+    private static object? mapJsonElement(JsonElement element)
+    {
+        switch (element.ValueKind)
+        {
+            case JsonValueKind.Object:
+            {
+                var result = new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase);
+                foreach (var property in element.EnumerateObject())
+                    result[property.Name] = mapJsonElement(property.Value);
+                return result;
+            }
+            case JsonValueKind.Array:
+            {
+                var result = new List<object?>();
+                foreach (var item in element.EnumerateArray())
+                    result.Add(mapJsonElement(item));
+                return result;
+            }
+            case JsonValueKind.String:
+                return element.GetString();
+            case JsonValueKind.Number:
+                if (element.TryGetInt64(out var longValue))
+                    return longValue;
+                if (element.TryGetDecimal(out var decimalValue))
+                    return decimalValue;
+                return element.GetDouble();
+            case JsonValueKind.True:
+                return true;
+            case JsonValueKind.False:
+                return false;
+            case JsonValueKind.Null:
+            case JsonValueKind.Undefined:
+            default:
+                return null;
+        }
     }
 }

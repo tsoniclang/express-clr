@@ -31,6 +31,18 @@ app.listen(3000);
 dotnet build src/expressjs/expressjs.csproj -c Release
 ```
 
+## NativeAOT Validation
+
+`expressjs-clr` is designed for NativeAOT-first usage on ASP.NET Core primitives.
+
+Validation command:
+
+```bash
+dotnet publish src/expressjs/expressjs.csproj -c Release -r linux-x64 -p:PublishAot=true -warnaserror
+```
+
+Current runtime avoids `DynamicInvoke` and reflection-based `System.Text.Json` serialization/deserialization paths.
+
 ## Test
 
 ```bash

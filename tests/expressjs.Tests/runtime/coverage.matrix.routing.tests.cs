@@ -378,20 +378,21 @@ public class coverage_matrix_routing_tests
     }
 
     [Fact]
-    public async Task method_with_null_value_and_dynamic_invoke_argument_errors_are_handled()
+    public async Task method_with_null_value_and_unsupported_delegate_handlers_fall_through()
     {
         var app = express.create();
         app.method(null!, "/null-method", (Action<Request, Response>)(static (_, res) => res.send("null-method")));
         await assertRoute(app, "GET", "/null-method", "null-method");
 
         app.get("/badinvoke", (object)(Func<int, int, int, int>)((_, _, _) => 1));
+        app.get("/badinvoke", (Action<Request, Response>)(static (_, res) => res.send("fallback")));
         app.use((Func<Exception, Request, Response, NextFunction, Task>)(static (_, __, res, ___) =>
         {
             res.status(500).send("invoke-error");
             return Task.CompletedTask;
         }));
 
-        await assertRoute(app, "GET", "/badinvoke", "invoke-error", expectedStatus: 500);
+        await assertRoute(app, "GET", "/badinvoke", "fallback");
     }
 
     private static async Task assertRoute(Application app, string method, string path, string expectedBody, int expectedStatus = 200)
