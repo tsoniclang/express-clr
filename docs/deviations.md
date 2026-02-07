@@ -1,6 +1,6 @@
 # Express 5.x Compatibility Deviations
 
-`expressjs-clr` is implemented on ASP.NET Core primitives and targets maximum practical Express API coverage.
+`express-clr` is implemented on ASP.NET Core primitives and targets maximum practical Express API coverage.
 
 Known deviations:
 
