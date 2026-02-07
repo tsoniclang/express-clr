@@ -1,0 +1,10 @@
+{
+  "name": "@tsonic/expressjs-clr",
+  "private": true,
+  "description": "CLR implementation project for @tsonic/expressjs",
+  "scripts": {
+    "build": "dotnet build src/expressjs/expressjs.csproj",
+    "test": "dotnet test tests/expressjs.Tests/expressjs.Tests.csproj",
+    "pack": "dotnet pack src/expressjs/expressjs.csproj -c Release"
+  }
+}
