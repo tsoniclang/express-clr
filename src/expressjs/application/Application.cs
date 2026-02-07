@@ -64,7 +64,7 @@ public class Application : Router
         app.Urls.Add($"http://unix:{path}");
         app.Start();
         callback?.Invoke();
-        return new AppServer(null, null, path);
+        return new AppServer(null, null, path, createCloseAction(app));
     }
 
     public AppServer listen(int port, Action? callback = null)
@@ -73,7 +73,7 @@ public class Application : Router
         app.Urls.Add($"http://127.0.0.1:{port}");
         app.Start();
         callback?.Invoke();
-        return new AppServer(port, null, null);
+        return new AppServer(port, null, null, createCloseAction(app));
     }
 
     public AppServer listen(int port, string host, Action? callback = null)
@@ -82,7 +82,7 @@ public class Application : Router
         app.Urls.Add($"http://{host}:{port}");
         app.Start();
         callback?.Invoke();
-        return new AppServer(port, host, null);
+        return new AppServer(port, host, null, createCloseAction(app));
     }
 
     public AppServer listen(int port, string host, int backlog, Action? callback = null)
@@ -184,5 +184,14 @@ public class Application : Router
 
         child.mountpath = mountedAt;
         child.mount?.Invoke(this);
+    }
+
+    private static Action createCloseAction(WebApplication app)
+    {
+        return () =>
+        {
+            app.StopAsync().GetAwaiter().GetResult();
+            app.DisposeAsync().AsTask().GetAwaiter().GetResult();
+        };
     }
 }
