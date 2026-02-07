@@ -49,7 +49,7 @@ public class Request
         baseUrl = string.Empty;
         originalUrl = path + context.Request.QueryString.Value;
         protocol = context.Request.Scheme;
-        host = context.Request.Host.Value ?? string.Empty;
+        host = context.Request.Host.ToString();
         hostname = context.Request.Host.Host;
         ip = context.Connection.RemoteIpAddress?.ToString() ?? string.Empty;
         xhr = string.Equals(context.Request.Headers["X-Requested-With"], "XMLHttpRequest", StringComparison.OrdinalIgnoreCase);

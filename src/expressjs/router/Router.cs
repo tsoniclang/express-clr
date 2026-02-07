@@ -137,16 +137,16 @@ public class Router : RoutingHost<Router>
         var allHandlers = flattenHandlers(callback, callbacks);
         foreach (var handler in allHandlers)
         {
-            if (handler is Router mountedRouter)
+            if (handler is Application mountedApp)
             {
-                foreach (var exported in mountedRouter.export(path))
+                foreach (var exported in mountedApp.export(path))
                     _layers.Add(exported);
                 continue;
             }
 
-            if (handler is Application mountedApp)
+            if (handler is Router mountedRouter)
             {
-                foreach (var exported in mountedApp.export(path))
+                foreach (var exported in mountedRouter.export(path))
                     _layers.Add(exported);
                 continue;
             }
