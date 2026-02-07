@@ -126,10 +126,10 @@ public class request_response_runtime_tests
         var req = new Request { app = app };
         var res = new Response { req = req };
 
-        res.json(new { ok = true });
+        res.json(new Dictionary<string, object?> { ["ok"] = true });
         Assert.Equal("application/json", res.get("Content-Type"));
 
-        res.jsonp(new { ok = true });
+        res.jsonp(new Dictionary<string, object?> { ["ok"] = true });
         Assert.Equal("application/javascript", res.get("Content-Type"));
     }
 }

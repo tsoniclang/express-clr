@@ -347,52 +347,86 @@ public class Router : RoutingHost<Router>
         Exception? error = currentError;
         foreach (var handler in handlers)
         {
-            if (handler is Delegate callback)
+            var nextCalled = false;
+            string? control = null;
+            Task next(string? value)
             {
-                var parameterCount = callback.Method.GetParameters().Length;
-                if (error is null && parameterCount == 4)
-                    continue;
-                if (error is not null && parameterCount != 4)
-                    continue;
-                if (error is null && parameterCount < 2)
-                    continue;
+                nextCalled = true;
+                control = value;
+                return Task.CompletedTask;
+            }
 
-                var nextCalled = false;
-                string? control = null;
-                async Task next(string? value)
+            try
+            {
+                if (error is null)
                 {
-                    nextCalled = true;
-                    control = value;
-                    await Task.CompletedTask.ConfigureAwait(false);
-                }
-
-                try
-                {
-                    object? result;
-                    if (parameterCount == 4)
-                        result = callback.DynamicInvoke(error, request, response, (NextFunction)next);
-                    else if (parameterCount == 2)
-                        result = callback.DynamicInvoke(request, response);
-                    else
-                        result = callback.DynamicInvoke(request, response, (NextFunction)next);
-
-                    if (result is Task task)
-                        await task.ConfigureAwait(false);
-
-                    if (nextCalled)
+                    switch (handler)
                     {
-                        if (!string.IsNullOrWhiteSpace(control))
-                            return (false, control, null);
-                        continue;
+                        case RequestHandler callback:
+                            await callback(request, response, next).ConfigureAwait(false);
+                            break;
+                        case Func<Request, Response, NextFunction, Task> callback:
+                            await callback(request, response, next).ConfigureAwait(false);
+                            break;
+                        case Func<Request, Response, NextFunction, ValueTask> callback:
+                            await callback(request, response, next).ConfigureAwait(false);
+                            break;
+                        case Func<Request, Response, NextFunction, object?> callback:
+                            _ = callback(request, response, next);
+                            break;
+                        case Action<Request, Response, NextFunction> callback:
+                            callback(request, response, next);
+                            break;
+                        case Func<Request, Response, Task> callback:
+                            await callback(request, response).ConfigureAwait(false);
+                            break;
+                        case Func<Request, Response, ValueTask> callback:
+                            await callback(request, response).ConfigureAwait(false);
+                            break;
+                        case Func<Request, Response, object?> callback:
+                            _ = callback(request, response);
+                            break;
+                        case Action<Request, Response> callback:
+                            callback(request, response);
+                            break;
+                        default:
+                            continue;
                     }
-
-                    return (true, null, null);
                 }
-                catch (Exception ex)
+                else
                 {
-                    error = ex.InnerException ?? ex;
+                    switch (handler)
+                    {
+                        case Func<Exception, Request, Response, NextFunction, Task> callback:
+                            await callback(error, request, response, next).ConfigureAwait(false);
+                            break;
+                        case Func<Exception, Request, Response, NextFunction, ValueTask> callback:
+                            await callback(error, request, response, next).ConfigureAwait(false);
+                            break;
+                        case Func<Exception, Request, Response, NextFunction, object?> callback:
+                            _ = callback(error, request, response, next);
+                            break;
+                        case Action<Exception, Request, Response, NextFunction> callback:
+                            callback(error, request, response, next);
+                            break;
+                        default:
+                            continue;
+                    }
+                }
+
+                if (nextCalled)
+                {
+                    if (!string.IsNullOrWhiteSpace(control))
+                        return (false, control, null);
                     continue;
                 }
+
+                return (true, null, null);
+            }
+            catch (Exception ex)
+            {
+                error = ex;
+                continue;
             }
         }
 

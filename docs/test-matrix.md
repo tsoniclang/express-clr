@@ -8,6 +8,11 @@ This matrix tracks runtime coverage for the current `expressjs-clr` API surface.
 - Thresholds: `line=100`, `branch=100`, `method=100`
 - Current result: `100% / 100% / 100%` on `expressjs` module
 
+## NativeAOT Gate
+
+- Command: `dotnet publish src/expressjs/expressjs.csproj -c Release -r linux-x64 -p:PublishAot=true -warnaserror`
+- Purpose: ensure runtime stays compatible with NativeAOT and trimming constraints.
+
 ## Matrix
 
 | Area | API surface | Coverage mode | Status |
