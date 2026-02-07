@@ -13,11 +13,11 @@
     <Authors>tsoniclang</Authors>
     <Company>Tsonic</Company>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <RepositoryUrl>https://github.com/tsoniclang/expressjs-clr</RepositoryUrl>
+    <RepositoryUrl>https://github.com/tsoniclang/express-clr</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageProjectUrl>https://github.com/tsoniclang/expressjs-clr</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/tsoniclang/express-clr</PackageProjectUrl>
     <Description>Express.js style API surface for .NET and Tsonic.</Description>
-    <PackageTags>tsonic;expressjs;dotnet;typescript</PackageTags>
+    <PackageTags>tsonic;express;dotnet;typescript</PackageTags>
 
     <NoWarn>$(NoWarn);CS8981</NoWarn>
 

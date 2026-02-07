@@ -1,16 +1,16 @@
 # Express 5.x API Test Matrix
 
-This matrix tracks runtime coverage for the current `expressjs-clr` API surface.
+This matrix tracks runtime coverage for the current `express-clr` API surface.
 
 ## Coverage Gate
 
 - Command: `npm run test:coverage`
 - Thresholds: `line=100`, `branch=100`, `method=100`
-- Current result: `100% / 100% / 100%` on `expressjs` module
+- Current result: `100% / 100% / 100%` on `express` module
 
 ## NativeAOT Gate
 
-- Command: `dotnet publish src/expressjs/expressjs.csproj -c Release -r linux-x64 -p:PublishAot=true -warnaserror`
+- Command: `dotnet publish src/express/express.csproj -c Release -r linux-x64 -p:PublishAot=true -warnaserror`
 - Purpose: ensure runtime stays compatible with NativeAOT and trimming constraints.
 
 ## Matrix
@@ -30,10 +30,10 @@ This matrix tracks runtime coverage for the current `expressjs-clr` API surface.
 
 ## Test Files
 
-- `tests/expressjs.Tests/runtime/coverage.matrix.application.tests.cs`
-- `tests/expressjs.Tests/runtime/coverage.matrix.express.tests.cs`
-- `tests/expressjs.Tests/runtime/coverage.matrix.infrastructure.tests.cs`
-- `tests/expressjs.Tests/runtime/coverage.matrix.request.tests.cs`
-- `tests/expressjs.Tests/runtime/coverage.matrix.response.tests.cs`
-- `tests/expressjs.Tests/runtime/coverage.matrix.routing.tests.cs`
+- `tests/express.Tests/runtime/coverage.matrix.application.tests.cs`
+- `tests/express.Tests/runtime/coverage.matrix.express.tests.cs`
+- `tests/express.Tests/runtime/coverage.matrix.infrastructure.tests.cs`
+- `tests/express.Tests/runtime/coverage.matrix.request.tests.cs`
+- `tests/express.Tests/runtime/coverage.matrix.response.tests.cs`
+- `tests/express.Tests/runtime/coverage.matrix.routing.tests.cs`
 - Existing runtime and surface suites remain in place as regression tests.

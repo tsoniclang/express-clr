@@ -1,11 +1,11 @@
 {
-  "name": "@tsonic/expressjs-clr",
+  "name": "@tsonic/express-clr",
   "private": true,
-  "description": "CLR implementation project for @tsonic/expressjs",
+  "description": "CLR implementation project for @tsonic/express",
   "scripts": {
-    "build": "dotnet build src/expressjs/expressjs.csproj",
-    "test": "dotnet test tests/expressjs.Tests/expressjs.Tests.csproj",
-    "test:coverage": "dotnet test tests/expressjs.Tests/expressjs.Tests.csproj -c Release /p:CollectCoverage=true /p:CoverletOutput=artifacts/coverage/ /p:CoverletOutputFormat=json%2clcov /p:Threshold=100 /p:ThresholdType=line%2cbranch%2cmethod /p:ThresholdStat=total",
-    "pack": "dotnet pack src/expressjs/expressjs.csproj -c Release"
+    "build": "dotnet build src/express/express.csproj",
+    "test": "dotnet test tests/express.Tests/express.Tests.csproj",
+    "test:coverage": "dotnet test tests/express.Tests/express.Tests.csproj -c Release /p:CollectCoverage=true /p:CoverletOutput=artifacts/coverage/ /p:CoverletOutputFormat=json%2clcov /p:Threshold=100 /p:ThresholdType=line%2cbranch%2cmethod /p:ThresholdStat=total",
+    "pack": "dotnet pack src/express/express.csproj -c Release"
   }
 }

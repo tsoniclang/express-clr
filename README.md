@@ -1,8 +1,8 @@
-# expressjs-clr
+# express-clr
 
-`expressjs-clr` is the runtime implementation for Express-style APIs on ASP.NET Core.
+`express-clr` is the runtime implementation for Express-style APIs on ASP.NET Core.
 
-It is the source of truth for behavior and parity decisions. The `expressjs` repo publishes the generated TypeScript package that targets this runtime.
+It is the source of truth for behavior and parity decisions. The `express` repo publishes the generated TypeScript package that targets this runtime.
 
 ## Scope
 
@@ -13,7 +13,7 @@ It is the source of truth for behavior and parity decisions. The `expressjs` rep
 ## Quick Start
 
 ```csharp
-using expressjs;
+using express;
 
 var app = express.create();
 
@@ -28,17 +28,17 @@ app.listen(3000);
 ## Build
 
 ```bash
-dotnet build src/expressjs/expressjs.csproj -c Release
+dotnet build src/express/express.csproj -c Release
 ```
 
 ## NativeAOT Validation
 
-`expressjs-clr` is designed for NativeAOT-first usage on ASP.NET Core primitives.
+`express-clr` is designed for NativeAOT-first usage on ASP.NET Core primitives.
 
 Validation command:
 
 ```bash
-dotnet publish src/expressjs/expressjs.csproj -c Release -r linux-x64 -p:PublishAot=true -warnaserror
+dotnet publish src/express/express.csproj -c Release -r linux-x64 -p:PublishAot=true -warnaserror
 ```
 
 Current runtime avoids `DynamicInvoke` and reflection-based `System.Text.Json` serialization/deserialization paths.
@@ -46,7 +46,7 @@ Current runtime avoids `DynamicInvoke` and reflection-based `System.Text.Json` s
 ## Test
 
 ```bash
-dotnet test tests/expressjs.Tests/expressjs.Tests.csproj -c Release
+dotnet test tests/express.Tests/express.Tests.csproj -c Release
 ```
 
 ## Coverage Gate
@@ -55,7 +55,7 @@ dotnet test tests/expressjs.Tests/expressjs.Tests.csproj -c Release
 npm run test:coverage
 ```
 
-The coverage gate enforces `line`, `branch`, and `method` coverage at `100%` for the `expressjs` assembly.
+The coverage gate enforces `line`, `branch`, and `method` coverage at `100%` for the `express` assembly.
 
 ## Documentation Map
 

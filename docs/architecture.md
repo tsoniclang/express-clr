@@ -1,6 +1,6 @@
 # Runtime Architecture
 
-This document describes how `expressjs-clr` maps Express-style APIs onto ASP.NET Core.
+This document describes how `express-clr` maps Express-style APIs onto ASP.NET Core.
 
 ## Design Principles
 
@@ -11,7 +11,7 @@ This document describes how `expressjs-clr` maps Express-style APIs onto ASP.NET
 
 ## Core Mapping
 
-| Express concept | `expressjs-clr` type | ASP.NET Core primitive |
+| Express concept | `express-clr` type | ASP.NET Core primitive |
 |---|---|---|
 | Top-level factory (`express()`) | `express.create()` / `express.app()` | `WebApplication` creation in `Application.listen(...)` |
 | App/router pipeline | `Application : Router` and `Router` layers | `HttpContext` dispatch loop |
@@ -71,5 +71,5 @@ Behavior is implemented close to Express semantics, with remaining differences t
 
 ## Runtime vs Types Repo
 
-- Runtime semantics belong in `expressjs-clr` docs.
-- Generated TypeScript package and release workflow belong in `expressjs` docs.
+- Runtime semantics belong in `express-clr` docs.
+- Generated TypeScript package and release workflow belong in `express` docs.
