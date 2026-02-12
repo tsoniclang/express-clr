@@ -1,3 +1,5 @@
+using System.Threading.Tasks;
+
 namespace express;
 
 public class Route : RoutingHost<Route>
@@ -9,6 +11,42 @@ public class Route : RoutingHost<Route>
     {
         _router = router;
         this.path = path;
+    }
+
+    public Route all(System.Func<Request, Response, Task> callback, params System.Func<Request, Response, Task>[] callbacks)
+    {
+        _router.all(path, callback, callbacks);
+        return this;
+    }
+
+    public Route all(System.Func<Request, Response, object?> callback, params System.Func<Request, Response, object?>[] callbacks)
+    {
+        _router.all(path, callback, callbacks);
+        return this;
+    }
+
+    public Route all(System.Action<Request, Response> callback, params System.Action<Request, Response>[] callbacks)
+    {
+        _router.all(path, callback, callbacks);
+        return this;
+    }
+
+    public Route all(RequestHandler callback, params RequestHandler[] callbacks)
+    {
+        _router.all(path, callback, callbacks);
+        return this;
+    }
+
+    public Route all(System.Func<Request, Response, NextFunction, object?> callback, params System.Func<Request, Response, NextFunction, object?>[] callbacks)
+    {
+        _router.all(path, callback, callbacks);
+        return this;
+    }
+
+    public Route all(System.Action<Request, Response, NextFunction> callback, params System.Action<Request, Response, NextFunction>[] callbacks)
+    {
+        _router.all(path, callback, callbacks);
+        return this;
     }
 
     public Route all(object callback, params object[] callbacks)
@@ -41,6 +79,42 @@ public class Route : RoutingHost<Route>
         return this;
     }
 
+    public Route delete(System.Func<Request, Response, Task> callback, params System.Func<Request, Response, Task>[] callbacks)
+    {
+        _router.delete(path, callback, callbacks);
+        return this;
+    }
+
+    public Route delete(System.Func<Request, Response, object?> callback, params System.Func<Request, Response, object?>[] callbacks)
+    {
+        _router.delete(path, callback, callbacks);
+        return this;
+    }
+
+    public Route delete(System.Action<Request, Response> callback, params System.Action<Request, Response>[] callbacks)
+    {
+        _router.delete(path, callback, callbacks);
+        return this;
+    }
+
+    public Route delete(RequestHandler callback, params RequestHandler[] callbacks)
+    {
+        _router.delete(path, callback, callbacks);
+        return this;
+    }
+
+    public Route delete(System.Func<Request, Response, NextFunction, object?> callback, params System.Func<Request, Response, NextFunction, object?>[] callbacks)
+    {
+        _router.delete(path, callback, callbacks);
+        return this;
+    }
+
+    public Route delete(System.Action<Request, Response, NextFunction> callback, params System.Action<Request, Response, NextFunction>[] callbacks)
+    {
+        _router.delete(path, callback, callbacks);
+        return this;
+    }
+
     public override Route delete(object routePath, object callback, params object[] callbacks)
     {
         _router.delete(path, callback, callbacks);
@@ -48,6 +122,42 @@ public class Route : RoutingHost<Route>
     }
 
     public Route get(object callback, params object[] callbacks)
+    {
+        _router.get(path, callback, callbacks);
+        return this;
+    }
+
+    public Route get(System.Func<Request, Response, Task> callback, params System.Func<Request, Response, Task>[] callbacks)
+    {
+        _router.get(path, callback, callbacks);
+        return this;
+    }
+
+    public Route get(System.Func<Request, Response, object?> callback, params System.Func<Request, Response, object?>[] callbacks)
+    {
+        _router.get(path, callback, callbacks);
+        return this;
+    }
+
+    public Route get(System.Action<Request, Response> callback, params System.Action<Request, Response>[] callbacks)
+    {
+        _router.get(path, callback, callbacks);
+        return this;
+    }
+
+    public Route get(RequestHandler callback, params RequestHandler[] callbacks)
+    {
+        _router.get(path, callback, callbacks);
+        return this;
+    }
+
+    public Route get(System.Func<Request, Response, NextFunction, object?> callback, params System.Func<Request, Response, NextFunction, object?>[] callbacks)
+    {
+        _router.get(path, callback, callbacks);
+        return this;
+    }
+
+    public Route get(System.Action<Request, Response, NextFunction> callback, params System.Action<Request, Response, NextFunction>[] callbacks)
     {
         _router.get(path, callback, callbacks);
         return this;
@@ -119,6 +229,42 @@ public class Route : RoutingHost<Route>
         return this;
     }
 
+    public Route options(System.Func<Request, Response, Task> callback, params System.Func<Request, Response, Task>[] callbacks)
+    {
+        _router.options(path, callback, callbacks);
+        return this;
+    }
+
+    public Route options(System.Func<Request, Response, object?> callback, params System.Func<Request, Response, object?>[] callbacks)
+    {
+        _router.options(path, callback, callbacks);
+        return this;
+    }
+
+    public Route options(System.Action<Request, Response> callback, params System.Action<Request, Response>[] callbacks)
+    {
+        _router.options(path, callback, callbacks);
+        return this;
+    }
+
+    public Route options(RequestHandler callback, params RequestHandler[] callbacks)
+    {
+        _router.options(path, callback, callbacks);
+        return this;
+    }
+
+    public Route options(System.Func<Request, Response, NextFunction, object?> callback, params System.Func<Request, Response, NextFunction, object?>[] callbacks)
+    {
+        _router.options(path, callback, callbacks);
+        return this;
+    }
+
+    public Route options(System.Action<Request, Response, NextFunction> callback, params System.Action<Request, Response, NextFunction>[] callbacks)
+    {
+        _router.options(path, callback, callbacks);
+        return this;
+    }
+
     public override Route options(object routePath, object callback, params object[] callbacks)
     {
         _router.options(path, callback, callbacks);
@@ -131,6 +277,42 @@ public class Route : RoutingHost<Route>
         return this;
     }
 
+    public Route patch(System.Func<Request, Response, Task> callback, params System.Func<Request, Response, Task>[] callbacks)
+    {
+        _router.patch(path, callback, callbacks);
+        return this;
+    }
+
+    public Route patch(System.Func<Request, Response, object?> callback, params System.Func<Request, Response, object?>[] callbacks)
+    {
+        _router.patch(path, callback, callbacks);
+        return this;
+    }
+
+    public Route patch(System.Action<Request, Response> callback, params System.Action<Request, Response>[] callbacks)
+    {
+        _router.patch(path, callback, callbacks);
+        return this;
+    }
+
+    public Route patch(RequestHandler callback, params RequestHandler[] callbacks)
+    {
+        _router.patch(path, callback, callbacks);
+        return this;
+    }
+
+    public Route patch(System.Func<Request, Response, NextFunction, object?> callback, params System.Func<Request, Response, NextFunction, object?>[] callbacks)
+    {
+        _router.patch(path, callback, callbacks);
+        return this;
+    }
+
+    public Route patch(System.Action<Request, Response, NextFunction> callback, params System.Action<Request, Response, NextFunction>[] callbacks)
+    {
+        _router.patch(path, callback, callbacks);
+        return this;
+    }
+
     public override Route patch(object routePath, object callback, params object[] callbacks)
     {
         _router.patch(path, callback, callbacks);
@@ -138,6 +320,42 @@ public class Route : RoutingHost<Route>
     }
 
     public Route post(object callback, params object[] callbacks)
+    {
+        _router.post(path, callback, callbacks);
+        return this;
+    }
+
+    public Route post(System.Func<Request, Response, Task> callback, params System.Func<Request, Response, Task>[] callbacks)
+    {
+        _router.post(path, callback, callbacks);
+        return this;
+    }
+
+    public Route post(System.Func<Request, Response, object?> callback, params System.Func<Request, Response, object?>[] callbacks)
+    {
+        _router.post(path, callback, callbacks);
+        return this;
+    }
+
+    public Route post(System.Action<Request, Response> callback, params System.Action<Request, Response>[] callbacks)
+    {
+        _router.post(path, callback, callbacks);
+        return this;
+    }
+
+    public Route post(RequestHandler callback, params RequestHandler[] callbacks)
+    {
+        _router.post(path, callback, callbacks);
+        return this;
+    }
+
+    public Route post(System.Func<Request, Response, NextFunction, object?> callback, params System.Func<Request, Response, NextFunction, object?>[] callbacks)
+    {
+        _router.post(path, callback, callbacks);
+        return this;
+    }
+
+    public Route post(System.Action<Request, Response, NextFunction> callback, params System.Action<Request, Response, NextFunction>[] callbacks)
     {
         _router.post(path, callback, callbacks);
         return this;
@@ -156,6 +374,42 @@ public class Route : RoutingHost<Route>
     }
 
     public Route put(object callback, params object[] callbacks)
+    {
+        _router.put(path, callback, callbacks);
+        return this;
+    }
+
+    public Route put(System.Func<Request, Response, Task> callback, params System.Func<Request, Response, Task>[] callbacks)
+    {
+        _router.put(path, callback, callbacks);
+        return this;
+    }
+
+    public Route put(System.Func<Request, Response, object?> callback, params System.Func<Request, Response, object?>[] callbacks)
+    {
+        _router.put(path, callback, callbacks);
+        return this;
+    }
+
+    public Route put(System.Action<Request, Response> callback, params System.Action<Request, Response>[] callbacks)
+    {
+        _router.put(path, callback, callbacks);
+        return this;
+    }
+
+    public Route put(RequestHandler callback, params RequestHandler[] callbacks)
+    {
+        _router.put(path, callback, callbacks);
+        return this;
+    }
+
+    public Route put(System.Func<Request, Response, NextFunction, object?> callback, params System.Func<Request, Response, NextFunction, object?>[] callbacks)
+    {
+        _router.put(path, callback, callbacks);
+        return this;
+    }
+
+    public Route put(System.Action<Request, Response, NextFunction> callback, params System.Action<Request, Response, NextFunction>[] callbacks)
     {
         _router.put(path, callback, callbacks);
         return this;
