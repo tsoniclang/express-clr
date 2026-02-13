@@ -190,6 +190,10 @@ public abstract class RoutingHost<TSelf> where TSelf : RoutingHost<TSelf>
     public TSelf use(ErrorRequestHandlerReturn callback, params ErrorRequestHandlerReturn[] callbacks) => use((object)"/", callback, callbacks);
     public TSelf use(ErrorRequestHandlerSync callback, params ErrorRequestHandlerSync[] callbacks) => use((object)"/", callback, callbacks);
 
+    // Router/app mounting overloads (best-effort parity with Express.js).
+    public TSelf use(Router router) => use((object)router);
+    public TSelf use(string path, Router router) => use((object)path, router);
+
     public TSelf use(string path, RouteHandler callback, params RouteHandler[] callbacks) => use((object)path, callback, callbacks);
     public TSelf use(string path, RouteHandlerReturn callback, params RouteHandlerReturn[] callbacks) => use((object)path, callback, callbacks);
     public TSelf use(string path, RouteHandlerSync callback, params RouteHandlerSync[] callbacks) => use((object)path, callback, callbacks);
@@ -209,34 +213,37 @@ public abstract class RoutingHost<TSelf> where TSelf : RoutingHost<TSelf>
     public TSelf method(string method, string path, RequestHandlerReturn callback, params RequestHandlerReturn[] callbacks) => self.method(method, (object)path, callback, callbacks);
     public TSelf method(string method, string path, RequestHandlerSync callback, params RequestHandlerSync[] callbacks) => self.method(method, (object)path, callback, callbacks);
 
-    public virtual TSelf all(object path, object callback, params object[] callbacks) => self;
-    public virtual TSelf checkout(object path, object callback, params object[] callbacks) => self;
-    public virtual TSelf copy(object path, object callback, params object[] callbacks) => self;
-    public virtual TSelf delete(object path, object callback, params object[] callbacks) => self;
-    public virtual TSelf get(object path, object callback, params object[] callbacks) => self;
-    public virtual TSelf head(object path, object callback, params object[] callbacks) => self;
-    public virtual TSelf lock_(object path, object callback, params object[] callbacks) => self;
-    public virtual TSelf merge(object path, object callback, params object[] callbacks) => self;
-    public virtual TSelf method(string method, object path, object callback, params object[] callbacks) => self;
-    public virtual TSelf mkactivity(object path, object callback, params object[] callbacks) => self;
-    public virtual TSelf mkcol(object path, object callback, params object[] callbacks) => self;
-    public virtual TSelf move(object path, object callback, params object[] callbacks) => self;
-    public virtual TSelf m_search(object path, object callback, params object[] callbacks) => self;
-    public virtual TSelf notify(object path, object callback, params object[] callbacks) => self;
-    public virtual TSelf options(object path, object callback, params object[] callbacks) => self;
-    public virtual TSelf patch(object path, object callback, params object[] callbacks) => self;
-    public virtual TSelf post(object path, object callback, params object[] callbacks) => self;
-    public virtual TSelf purge(object path, object callback, params object[] callbacks) => self;
-    public virtual TSelf put(object path, object callback, params object[] callbacks) => self;
-    public virtual TSelf report(object path, object callback, params object[] callbacks) => self;
-    public virtual TSelf search(object path, object callback, params object[] callbacks) => self;
-    public virtual TSelf subscribe(object path, object callback, params object[] callbacks) => self;
-    public virtual TSelf trace(object path, object callback, params object[] callbacks) => self;
-    public virtual TSelf unlock(object path, object callback, params object[] callbacks) => self;
-    public virtual TSelf unsubscribe(object path, object callback, params object[] callbacks) => self;
+    // Object-based core API (internal): used by strongly-typed wrappers above and overridden by Router/Route.
+    // We intentionally keep these out of the public surface so tsbindgen does not have to emit `unknown`
+    // catchall overloads for JS consumers.
+    internal virtual TSelf all(object path, object callback, params object[] callbacks) => self;
+    internal virtual TSelf checkout(object path, object callback, params object[] callbacks) => self;
+    internal virtual TSelf copy(object path, object callback, params object[] callbacks) => self;
+    internal virtual TSelf delete(object path, object callback, params object[] callbacks) => self;
+    internal virtual TSelf get(object path, object callback, params object[] callbacks) => self;
+    internal virtual TSelf head(object path, object callback, params object[] callbacks) => self;
+    internal virtual TSelf lock_(object path, object callback, params object[] callbacks) => self;
+    internal virtual TSelf merge(object path, object callback, params object[] callbacks) => self;
+    internal virtual TSelf method(string method, object path, object callback, params object[] callbacks) => self;
+    internal virtual TSelf mkactivity(object path, object callback, params object[] callbacks) => self;
+    internal virtual TSelf mkcol(object path, object callback, params object[] callbacks) => self;
+    internal virtual TSelf move(object path, object callback, params object[] callbacks) => self;
+    internal virtual TSelf m_search(object path, object callback, params object[] callbacks) => self;
+    internal virtual TSelf notify(object path, object callback, params object[] callbacks) => self;
+    internal virtual TSelf options(object path, object callback, params object[] callbacks) => self;
+    internal virtual TSelf patch(object path, object callback, params object[] callbacks) => self;
+    internal virtual TSelf post(object path, object callback, params object[] callbacks) => self;
+    internal virtual TSelf purge(object path, object callback, params object[] callbacks) => self;
+    internal virtual TSelf put(object path, object callback, params object[] callbacks) => self;
+    internal virtual TSelf report(object path, object callback, params object[] callbacks) => self;
+    internal virtual TSelf search(object path, object callback, params object[] callbacks) => self;
+    internal virtual TSelf subscribe(object path, object callback, params object[] callbacks) => self;
+    internal virtual TSelf trace(object path, object callback, params object[] callbacks) => self;
+    internal virtual TSelf unlock(object path, object callback, params object[] callbacks) => self;
+    internal virtual TSelf unsubscribe(object path, object callback, params object[] callbacks) => self;
 
     public virtual TSelf param(string name, ParamHandler callback) => self;
-    public virtual Route route(object path) => throw new NotSupportedException();
-    public virtual TSelf use(object callback, params object[] callbacks) => self;
-    public virtual TSelf use(object path, object callback, params object[] callbacks) => self;
+    internal virtual Route route(object path) => throw new NotSupportedException();
+    internal virtual TSelf use(object callback, params object[] callbacks) => self;
+    internal virtual TSelf use(object path, object callback, params object[] callbacks) => self;
 }
