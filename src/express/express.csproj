@@ -5,7 +5,7 @@
     <Version>1.0.0</Version>
 
     <IsPackable>true</IsPackable>
-    <PackageId>express</PackageId>
+    <PackageId>Tsonic.Express</PackageId>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
