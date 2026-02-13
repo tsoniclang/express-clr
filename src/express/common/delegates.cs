@@ -6,6 +6,14 @@ namespace express;
 
 public delegate Task NextFunction(string? control);
 public delegate Task RequestHandler(Request req, Response res, NextFunction next);
+public delegate void RequestHandlerSync(Request req, Response res, NextFunction next);
+public delegate object? RequestHandlerReturn(Request req, Response res, NextFunction next);
+public delegate Task RouteHandler(Request req, Response res);
+public delegate void RouteHandlerSync(Request req, Response res);
+public delegate object? RouteHandlerReturn(Request req, Response res);
+public delegate Task ErrorRequestHandler(Exception err, Request req, Response res, NextFunction next);
+public delegate void ErrorRequestHandlerSync(Exception err, Request req, Response res, NextFunction next);
+public delegate object? ErrorRequestHandlerReturn(Exception err, Request req, Response res, NextFunction next);
 public delegate Task ParamHandler(Request req, Response res, NextFunction next, object? value, string name);
 public delegate void VerifyBodyHandler(Request req, Response res, byte[] buffer, string? encoding);
 public delegate bool MediaTypeMatcher(Request req);

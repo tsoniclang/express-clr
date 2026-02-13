@@ -365,6 +365,12 @@ public class Router : RoutingHost<Router>
                         case RequestHandler callback:
                             await callback(request, response, next).ConfigureAwait(false);
                             break;
+                        case RequestHandlerSync callback:
+                            callback(request, response, next);
+                            break;
+                        case RequestHandlerReturn callback:
+                            _ = callback(request, response, next);
+                            break;
                         case Func<Request, Response, NextFunction, Task> callback:
                             await callback(request, response, next).ConfigureAwait(false);
                             break;
@@ -376,6 +382,15 @@ public class Router : RoutingHost<Router>
                             break;
                         case Action<Request, Response, NextFunction> callback:
                             callback(request, response, next);
+                            break;
+                        case RouteHandler callback:
+                            await callback(request, response).ConfigureAwait(false);
+                            break;
+                        case RouteHandlerSync callback:
+                            callback(request, response);
+                            break;
+                        case RouteHandlerReturn callback:
+                            _ = callback(request, response);
                             break;
                         case Func<Request, Response, Task> callback:
                             await callback(request, response).ConfigureAwait(false);
@@ -397,6 +412,15 @@ public class Router : RoutingHost<Router>
                 {
                     switch (handler)
                     {
+                        case ErrorRequestHandler callback:
+                            await callback(error, request, response, next).ConfigureAwait(false);
+                            break;
+                        case ErrorRequestHandlerSync callback:
+                            callback(error, request, response, next);
+                            break;
+                        case ErrorRequestHandlerReturn callback:
+                            _ = callback(error, request, response, next);
+                            break;
                         case Func<Exception, Request, Response, NextFunction, Task> callback:
                             await callback(error, request, response, next).ConfigureAwait(false);
                             break;
