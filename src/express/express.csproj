@@ -2,7 +2,7 @@
   <PropertyGroup>
     <AssemblyName>express</AssemblyName>
     <RootNamespace>express</RootNamespace>
-    <Version>1.0.2</Version>
+    <Version>1.0.3</Version>
 
     <IsPackable>true</IsPackable>
     <PackageId>Tsonic.Express</PackageId>

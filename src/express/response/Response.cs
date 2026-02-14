@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Http;
@@ -371,13 +372,24 @@ public class Response
     {
         using var stream = new MemoryStream();
         using var writer = new Utf8JsonWriter(stream);
-        writeJsonValue(writer, body);
+        writeJsonValue(writer, body, new HashSet<object>(ReferenceEqualityComparer.Instance), depth: 0);
         writer.Flush();
         return Encoding.UTF8.GetString(stream.ToArray());
     }
 
-    private static void writeJsonValue(Utf8JsonWriter writer, object? value)
+    private static void writeJsonValue(Utf8JsonWriter writer, object? value, HashSet<object> visited, int depth)
     {
+        if (depth > 64)
+            throw new InvalidOperationException("JSON value nesting exceeded the supported depth.");
+
+        if (value is not null && value is not string && !value.GetType().IsValueType)
+        {
+            if (!visited.Add(value))
+                throw new InvalidOperationException("Circular reference detected while serializing JSON.");
+        }
+
+        try
+        {
         switch (value)
         {
             case null:
@@ -433,7 +445,7 @@ public class Response
                 foreach (var kvp in objectMap)
                 {
                     writer.WritePropertyName(kvp.Key);
-                    writeJsonValue(writer, kvp.Value);
+                    writeJsonValue(writer, kvp.Value, visited, depth + 1);
                 }
                 writer.WriteEndObject();
                 return;
@@ -449,12 +461,57 @@ public class Response
             case IEnumerable enumerable when value is not string:
                 writer.WriteStartArray();
                 foreach (var item in enumerable)
-                    writeJsonValue(writer, item);
+                    writeJsonValue(writer, item, visited, depth + 1);
                 writer.WriteEndArray();
                 return;
             default:
-                writer.WriteStringValue(value.ToString());
+                if (value is not null && tryWriteObject(writer, value, visited, depth + 1))
+                    return;
+
+                writer.WriteStringValue(value?.ToString());
                 return;
         }
+        }
+        finally
+        {
+            if (value is not null && value is not string && !value.GetType().IsValueType)
+                visited.Remove(value);
+        }
+    }
+
+    private static bool tryWriteObject(Utf8JsonWriter writer, object value, HashSet<object> visited, int depth)
+    {
+#pragma warning disable IL2075
+        var props = value.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+#pragma warning restore IL2075
+        if (props.Length == 0)
+            return false;
+
+        writer.WriteStartObject();
+
+        foreach (var prop in props)
+        {
+            if (prop.GetIndexParameters().Length != 0)
+                continue;
+            if (!prop.CanRead)
+                continue;
+
+            writer.WritePropertyName(prop.Name);
+
+            object? propValue;
+            try
+            {
+                propValue = prop.GetValue(value);
+            }
+            catch
+            {
+                propValue = null;
+            }
+
+            writeJsonValue(writer, propValue, visited, depth + 1);
+        }
+
+        writer.WriteEndObject();
+        return true;
     }
 }

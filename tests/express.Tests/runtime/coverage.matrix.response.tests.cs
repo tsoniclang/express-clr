@@ -92,6 +92,12 @@ public class coverage_matrix_response_tests
         res.json(new Dictionary<string, object?> { ["ok"] = true });
         Assert.Equal("application/json", res.get("Content-Type"));
 
+        var anonContext = test_runtime_utils.createContext("GET", "/");
+        var anonRequest = Request.fromHttpContext(anonContext, app);
+        var anonResponse = Response.fromHttpContext(anonContext, anonRequest);
+        anonResponse.json(new { ok = true });
+        Assert.Equal("{\"ok\":true}", test_runtime_utils.readBody(anonContext));
+
         res.jsonp("raw-jsonp");
         res.jsonp(new Dictionary<string, object?> { ["ok"] = true });
         Assert.Equal("application/javascript", res.get("Content-Type"));
