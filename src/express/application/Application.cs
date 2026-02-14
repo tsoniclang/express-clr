@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
@@ -63,8 +64,9 @@ public class Application : Router
         var app = buildWebApplication();
         app.Urls.Add($"http://unix:{path}");
         app.Start();
+        var keepAliveThread = startKeepAliveThread(app);
         callback?.Invoke();
-        return new AppServer(null, null, path, createCloseAction(app));
+        return new AppServer(null, null, path, createCloseAction(app, keepAliveThread), keepAliveThread);
     }
 
     public AppServer listen(int port, Action? callback = null)
@@ -72,8 +74,9 @@ public class Application : Router
         var app = buildWebApplication();
         app.Urls.Add($"http://127.0.0.1:{port}");
         app.Start();
+        var keepAliveThread = startKeepAliveThread(app);
         callback?.Invoke();
-        return new AppServer(port, null, null, createCloseAction(app));
+        return new AppServer(port, null, null, createCloseAction(app, keepAliveThread), keepAliveThread);
     }
 
     public AppServer listen(int port, string host, Action? callback = null)
@@ -81,8 +84,9 @@ public class Application : Router
         var app = buildWebApplication();
         app.Urls.Add($"http://{host}:{port}");
         app.Start();
+        var keepAliveThread = startKeepAliveThread(app);
         callback?.Invoke();
-        return new AppServer(port, host, null, createCloseAction(app));
+        return new AppServer(port, host, null, createCloseAction(app, keepAliveThread), keepAliveThread);
     }
 
     public AppServer listen(int port, string host, int backlog, Action? callback = null)
@@ -186,12 +190,39 @@ public class Application : Router
         child.mount?.Invoke(this);
     }
 
-    private static Action createCloseAction(WebApplication app)
+    private static Thread startKeepAliveThread(WebApplication app)
+    {
+        var keepAliveThread = new Thread(() =>
+        {
+            try
+            {
+                app.WaitForShutdownAsync().GetAwaiter().GetResult();
+            }
+            catch
+            {
+                // Ignore shutdown/dispose races: the goal is to keep the process alive,
+                // not to surface shutdown exceptions.
+            }
+        })
+        {
+            IsBackground = false,
+            Name = "express.listen.keepalive"
+        };
+
+        keepAliveThread.Start();
+        return keepAliveThread;
+    }
+
+    private static Action createCloseAction(WebApplication app, Thread keepAliveThread)
     {
         return () =>
         {
             app.StopAsync().GetAwaiter().GetResult();
             app.DisposeAsync().AsTask().GetAwaiter().GetResult();
+
+            // Best-effort cleanup: don't hang forever on shutdown.
+            if (keepAliveThread.IsAlive)
+                keepAliveThread.Join(TimeSpan.FromSeconds(2));
         };
     }
 }

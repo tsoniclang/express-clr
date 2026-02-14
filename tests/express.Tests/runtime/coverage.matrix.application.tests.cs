@@ -143,6 +143,9 @@ public class coverage_matrix_application_tests
         var server1 = app1.listen(port1, () => callback1 = true);
         Assert.True(callback1);
         Assert.True(server1.listening);
+        Assert.NotNull(server1.keepAliveThread);
+        Assert.False(server1.keepAliveThread!.IsBackground);
+        Assert.True(server1.keepAliveThread.IsAlive);
         Assert.Equal(port1, server1.port);
         Assert.Null(server1.host);
         Assert.Null(server1.path);
@@ -155,37 +158,50 @@ public class coverage_matrix_application_tests
 
         server1.close();
         Assert.False(server1.listening);
+        Assert.False(server1.keepAliveThread!.IsAlive);
 
         var app2 = express.create();
         var callback2 = false;
         var port2 = test_runtime_utils.reserveTcpPort();
         var server2 = app2.listen(port2, "127.0.0.1", () => callback2 = true);
         Assert.True(callback2);
+        Assert.NotNull(server2.keepAliveThread);
+        Assert.False(server2.keepAliveThread!.IsBackground);
+        Assert.True(server2.keepAliveThread.IsAlive);
         Assert.Equal(port2, server2.port);
         Assert.Equal("127.0.0.1", server2.host);
         server2.close();
         Assert.False(server2.listening);
+        Assert.False(server2.keepAliveThread!.IsAlive);
 
         var app3 = express.create();
         var callback3 = false;
         var port3 = test_runtime_utils.reserveTcpPort();
         var server3 = app3.listen(port3, "127.0.0.1", 128, () => callback3 = true);
         Assert.True(callback3);
+        Assert.NotNull(server3.keepAliveThread);
+        Assert.False(server3.keepAliveThread!.IsBackground);
+        Assert.True(server3.keepAliveThread.IsAlive);
         Assert.Equal(port3, server3.port);
         Assert.Equal("127.0.0.1", server3.host);
         server3.close();
         Assert.False(server3.listening);
+        Assert.False(server3.keepAliveThread!.IsAlive);
 
         var app4 = express.create();
         var callback4 = false;
         var socketPath = Path.Combine(Path.GetTempPath(), $"express-{Guid.NewGuid():N}.sock");
         var server4 = app4.listen(socketPath, () => callback4 = true);
         Assert.True(callback4);
+        Assert.NotNull(server4.keepAliveThread);
+        Assert.False(server4.keepAliveThread!.IsBackground);
+        Assert.True(server4.keepAliveThread.IsAlive);
         Assert.Equal(socketPath, server4.path);
 
         var closed = false;
         server4.close(_ => closed = true);
         Assert.True(closed);
         Assert.False(server4.listening);
+        Assert.False(server4.keepAliveThread!.IsAlive);
     }
 }
