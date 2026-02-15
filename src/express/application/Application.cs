@@ -130,22 +130,22 @@ public class Application : Router
         return this;
     }
 
-    public new Application use(object callback, params object[] callbacks)
+    internal override Router use(object callback, params object[] callbacks)
     {
-        base.use(callback, callbacks);
+        var result = base.use(callback, callbacks);
         notifyMount(callback, "/");
         foreach (var next in callbacks)
             notifyMount(next, "/");
-        return this;
+        return result;
     }
 
-    public new Application use(object path, object callback, params object[] callbacks)
+    internal override Router use(object path, object callback, params object[] callbacks)
     {
-        base.use(path, callback, callbacks);
+        var result = base.use(path, callback, callbacks);
         notifyMount(callback, path);
         foreach (var next in callbacks)
             notifyMount(next, path);
-        return this;
+        return result;
     }
 
     internal TemplateEngine? resolveEngine(string view)
