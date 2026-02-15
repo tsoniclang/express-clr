@@ -3,6 +3,8 @@
     <AssemblyName>express</AssemblyName>
     <RootNamespace>express</RootNamespace>
     <Version>1.0.1</Version>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
 
     <IsPackable>true</IsPackable>
     <PackageId>Tsonic.Express</PackageId>
