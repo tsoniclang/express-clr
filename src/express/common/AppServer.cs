@@ -22,6 +22,12 @@ public sealed class AppServer
 
     public void close(Action<Exception?>? callback = null)
     {
+        if (!listening)
+        {
+            callback?.Invoke(null);
+            return;
+        }
+
         try
         {
             _closeAction?.Invoke();

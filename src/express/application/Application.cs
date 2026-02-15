@@ -64,7 +64,18 @@ public class Application : Router
         app.Urls.Add($"http://unix:{path}");
         app.Start();
         callback?.Invoke();
-        return new AppServer(null, null, path, createCloseAction(app));
+        var keepAlive = ProcessKeepAlive.Acquire();
+        return new AppServer(null, null, path, () =>
+        {
+            try
+            {
+                createCloseAction(app)();
+            }
+            finally
+            {
+                keepAlive.Dispose();
+            }
+        });
     }
 
     public AppServer listen(int port, Action? callback = null)
@@ -73,7 +84,18 @@ public class Application : Router
         app.Urls.Add($"http://127.0.0.1:{port}");
         app.Start();
         callback?.Invoke();
-        return new AppServer(port, null, null, createCloseAction(app));
+        var keepAlive = ProcessKeepAlive.Acquire();
+        return new AppServer(port, null, null, () =>
+        {
+            try
+            {
+                createCloseAction(app)();
+            }
+            finally
+            {
+                keepAlive.Dispose();
+            }
+        });
     }
 
     public AppServer listen(int port, string host, Action? callback = null)
@@ -82,7 +104,18 @@ public class Application : Router
         app.Urls.Add($"http://{host}:{port}");
         app.Start();
         callback?.Invoke();
-        return new AppServer(port, host, null, createCloseAction(app));
+        var keepAlive = ProcessKeepAlive.Acquire();
+        return new AppServer(port, host, null, () =>
+        {
+            try
+            {
+                createCloseAction(app)();
+            }
+            finally
+            {
+                keepAlive.Dispose();
+            }
+        });
     }
 
     public AppServer listen(int port, string host, int backlog, Action? callback = null)
