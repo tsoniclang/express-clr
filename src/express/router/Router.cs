@@ -17,32 +17,32 @@ public class Router : RoutingHost<Router>
         _ = options;
     }
 
-    public override Router all(object path, object callback, params object[] callbacks) => addRoute(null, path, callback, callbacks);
-    public override Router checkout(object path, object callback, params object[] callbacks) => addRoute("CHECKOUT", path, callback, callbacks);
-    public override Router copy(object path, object callback, params object[] callbacks) => addRoute("COPY", path, callback, callbacks);
-    public override Router delete(object path, object callback, params object[] callbacks) => addRoute("DELETE", path, callback, callbacks);
-    public override Router get(object path, object callback, params object[] callbacks) => addRoute("GET", path, callback, callbacks);
-    public override Router head(object path, object callback, params object[] callbacks) => addRoute("HEAD", path, callback, callbacks);
-    public override Router lock_(object path, object callback, params object[] callbacks) => addRoute("LOCK", path, callback, callbacks);
-    public override Router merge(object path, object callback, params object[] callbacks) => addRoute("MERGE", path, callback, callbacks);
-    public override Router mkactivity(object path, object callback, params object[] callbacks) => addRoute("MKACTIVITY", path, callback, callbacks);
-    public override Router mkcol(object path, object callback, params object[] callbacks) => addRoute("MKCOL", path, callback, callbacks);
-    public override Router move(object path, object callback, params object[] callbacks) => addRoute("MOVE", path, callback, callbacks);
-    public override Router m_search(object path, object callback, params object[] callbacks) => addRoute("M-SEARCH", path, callback, callbacks);
-    public override Router notify(object path, object callback, params object[] callbacks) => addRoute("NOTIFY", path, callback, callbacks);
-    public override Router options(object path, object callback, params object[] callbacks) => addRoute("OPTIONS", path, callback, callbacks);
-    public override Router patch(object path, object callback, params object[] callbacks) => addRoute("PATCH", path, callback, callbacks);
-    public override Router post(object path, object callback, params object[] callbacks) => addRoute("POST", path, callback, callbacks);
-    public override Router purge(object path, object callback, params object[] callbacks) => addRoute("PURGE", path, callback, callbacks);
-    public override Router put(object path, object callback, params object[] callbacks) => addRoute("PUT", path, callback, callbacks);
-    public override Router report(object path, object callback, params object[] callbacks) => addRoute("REPORT", path, callback, callbacks);
-    public override Router search(object path, object callback, params object[] callbacks) => addRoute("SEARCH", path, callback, callbacks);
-    public override Router subscribe(object path, object callback, params object[] callbacks) => addRoute("SUBSCRIBE", path, callback, callbacks);
-    public override Router trace(object path, object callback, params object[] callbacks) => addRoute("TRACE", path, callback, callbacks);
-    public override Router unlock(object path, object callback, params object[] callbacks) => addRoute("UNLOCK", path, callback, callbacks);
-    public override Router unsubscribe(object path, object callback, params object[] callbacks) => addRoute("UNSUBSCRIBE", path, callback, callbacks);
+    internal override Router all(object path, object callback, params object[] callbacks) => addRoute(null, path, callback, callbacks);
+    internal override Router checkout(object path, object callback, params object[] callbacks) => addRoute("CHECKOUT", path, callback, callbacks);
+    internal override Router copy(object path, object callback, params object[] callbacks) => addRoute("COPY", path, callback, callbacks);
+    internal override Router delete(object path, object callback, params object[] callbacks) => addRoute("DELETE", path, callback, callbacks);
+    internal override Router get(object path, object callback, params object[] callbacks) => addRoute("GET", path, callback, callbacks);
+    internal override Router head(object path, object callback, params object[] callbacks) => addRoute("HEAD", path, callback, callbacks);
+    internal override Router lock_(object path, object callback, params object[] callbacks) => addRoute("LOCK", path, callback, callbacks);
+    internal override Router merge(object path, object callback, params object[] callbacks) => addRoute("MERGE", path, callback, callbacks);
+    internal override Router mkactivity(object path, object callback, params object[] callbacks) => addRoute("MKACTIVITY", path, callback, callbacks);
+    internal override Router mkcol(object path, object callback, params object[] callbacks) => addRoute("MKCOL", path, callback, callbacks);
+    internal override Router move(object path, object callback, params object[] callbacks) => addRoute("MOVE", path, callback, callbacks);
+    internal override Router m_search(object path, object callback, params object[] callbacks) => addRoute("M-SEARCH", path, callback, callbacks);
+    internal override Router notify(object path, object callback, params object[] callbacks) => addRoute("NOTIFY", path, callback, callbacks);
+    internal override Router options(object path, object callback, params object[] callbacks) => addRoute("OPTIONS", path, callback, callbacks);
+    internal override Router patch(object path, object callback, params object[] callbacks) => addRoute("PATCH", path, callback, callbacks);
+    internal override Router post(object path, object callback, params object[] callbacks) => addRoute("POST", path, callback, callbacks);
+    internal override Router purge(object path, object callback, params object[] callbacks) => addRoute("PURGE", path, callback, callbacks);
+    internal override Router put(object path, object callback, params object[] callbacks) => addRoute("PUT", path, callback, callbacks);
+    internal override Router report(object path, object callback, params object[] callbacks) => addRoute("REPORT", path, callback, callbacks);
+    internal override Router search(object path, object callback, params object[] callbacks) => addRoute("SEARCH", path, callback, callbacks);
+    internal override Router subscribe(object path, object callback, params object[] callbacks) => addRoute("SUBSCRIBE", path, callback, callbacks);
+    internal override Router trace(object path, object callback, params object[] callbacks) => addRoute("TRACE", path, callback, callbacks);
+    internal override Router unlock(object path, object callback, params object[] callbacks) => addRoute("UNLOCK", path, callback, callbacks);
+    internal override Router unsubscribe(object path, object callback, params object[] callbacks) => addRoute("UNSUBSCRIBE", path, callback, callbacks);
 
-    public override Router method(string method, object path, object callback, params object[] callbacks)
+    internal override Router method(string method, object path, object callback, params object[] callbacks)
     {
         return addRoute(method?.Trim().ToUpperInvariant(), path, callback, callbacks);
     }
@@ -59,17 +59,17 @@ public class Router : RoutingHost<Router>
         return this;
     }
 
-    public override Route route(object path)
+    internal override Route route(object path)
     {
         return new Route(this, path);
     }
 
-    public override Router use(object callback, params object[] callbacks)
+    internal override Router use(object callback, params object[] callbacks)
     {
         return addMiddleware("/", callback, callbacks);
     }
 
-    public override Router use(object path, object callback, params object[] callbacks)
+    internal override Router use(object path, object callback, params object[] callbacks)
     {
         return addMiddleware(path, callback, callbacks);
     }

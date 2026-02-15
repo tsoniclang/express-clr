@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace express;
 
-public delegate Task NextFunction(string? control);
+public delegate Task NextFunction(string? control = null);
 public delegate Task RequestHandler(Request req, Response res, NextFunction next);
 public delegate void RequestHandlerSync(Request req, Response res, NextFunction next);
 public delegate object? RequestHandlerReturn(Request req, Response res, NextFunction next);
