@@ -182,13 +182,9 @@ public abstract class RoutingHost<TSelf> where TSelf : RoutingHost<TSelf>
 
     public TSelf use(RequestHandler callback, params RequestHandler[] callbacks) => use((object)"/", callback, callbacks);
     public TSelf use(RequestHandlerSync callback, params RequestHandlerSync[] callbacks) => use((object)"/", callback, callbacks);
-    public TSelf use(RouteHandler callback, params RouteHandler[] callbacks) => use((object)"/", callback, callbacks);
-    public TSelf use(RouteHandlerSync callback, params RouteHandlerSync[] callbacks) => use((object)"/", callback, callbacks);
 
     public TSelf use(string path, RequestHandler callback, params RequestHandler[] callbacks) => use((object)path, callback, callbacks);
     public TSelf use(string path, RequestHandlerSync callback, params RequestHandlerSync[] callbacks) => use((object)path, callback, callbacks);
-    public TSelf use(string path, RouteHandler callback, params RouteHandler[] callbacks) => use((object)path, callback, callbacks);
-    public TSelf use(string path, RouteHandlerSync callback, params RouteHandlerSync[] callbacks) => use((object)path, callback, callbacks);
 
     public TSelf useError(ErrorRequestHandler callback, params ErrorRequestHandler[] callbacks) => use((object)"/", callback, callbacks);
     public TSelf useError(ErrorRequestHandlerSync callback, params ErrorRequestHandlerSync[] callbacks) => use((object)"/", callback, callbacks);
