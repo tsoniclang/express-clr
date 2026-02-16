@@ -137,6 +137,14 @@ public class Request
 
     public string? header(string field) => get(field);
 
+    public string? param(string name)
+    {
+        if (@params.TryGetValue(name, out var value))
+            return value?.ToString();
+
+        return null;
+    }
+
     public object? @is(params string[] types)
     {
         if (types.Length == 0)

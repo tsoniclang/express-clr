@@ -115,6 +115,18 @@ public class coverage_matrix_request_tests
     }
 
     [Fact]
+    public void param_reads_from_params_dictionary_and_coerces_to_string()
+    {
+        var req = new Request();
+        req.@params["id"] = "42";
+        Assert.Equal("42", req.param("id"));
+        Assert.Null(req.param("missing"));
+
+        req.@params["n"] = 123;
+        Assert.Equal("123", req.param("n"));
+    }
+
+    [Fact]
     public void from_http_context_handles_empty_path_missing_host_and_null_app()
     {
         var context = new DefaultHttpContext();
