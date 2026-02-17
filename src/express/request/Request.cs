@@ -14,7 +14,9 @@ public class Request
     public Application? app { get; set; }
     public string baseUrl { get; set; } = string.Empty;
     public object? body { get; set; }
-    public Dictionary<string, string> cookies { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+    public Cookies cookies { get; } = new();
+    public UploadedFile? file { get; set; }
+    public Files files { get; } = new();
     public bool fresh { get; set; }
     public string host { get; set; } = string.Empty;
     public string hostname { get; set; } = string.Empty;
@@ -29,7 +31,7 @@ public class Request
     public Response? res { get; set; }
     public Route? route { get; set; }
     public bool signed { get; set; }
-    public Dictionary<string, string> signedCookies { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+    public Cookies signedCookies { get; } = new();
     public List<string> subdomains { get; set; } = new();
     public bool xhr { get; set; }
 
@@ -59,7 +61,7 @@ public class Request
             _headers[header.Key] = header.Value.ToString();
 
         foreach (var cookie in context.Request.Cookies)
-            cookies[cookie.Key] = cookie.Value;
+            cookies.Set(cookie.Key, cookie.Value);
 
         foreach (var item in context.Request.Query)
             query[item.Key] = item.Value.Count == 1 ? item.Value[0] : item.Value.ToArray();

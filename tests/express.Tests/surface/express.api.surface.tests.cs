@@ -17,7 +17,10 @@ public class express_api_surface_tests
         assertMethod(type, "create");
         assertMethod(type, "application");
         assertMethod(type, "app");
+        assertMethod(type, "cookieParser");
+        assertMethod(type, "cors");
         assertMethod(type, "json");
+        assertMethod(type, "multipart");
         assertMethod(type, "raw");
         assertMethod(type, "Router");
         assertMethod(type, "static");
@@ -62,9 +65,9 @@ public class express_api_surface_tests
 
         var properties = new[]
         {
-            "app", "baseUrl", "body", "cookies", "fresh", "host", "hostname", "ip", "ips",
+            "app", "baseUrl", "body", "cookies", "file", "files", "fresh", "host", "hostname", "ip", "ips",
             "method", "originalUrl", "params", "path", "protocol", "query", "res", "route",
-            "secure", "signedCookies", "stale", "subdomains", "xhr"
+            "secure", "signed", "signedCookies", "stale", "subdomains", "xhr"
         };
         foreach (var property in properties)
             assertProperty(type, property);

@@ -51,9 +51,10 @@ public class coverage_matrix_express_tests
         app.use(express.raw(new RawOptions { type = "application/custom" }));
         app.use(express.text(new TextOptions { type = "text/custom" }));
         app.use(express.urlencoded(new UrlEncodedOptions { type = "application/x-custom-form" }));
-        app.post("/skip", static (Request req, Response res) =>
+        app.post("/skip", static (Request req, Response res, NextFunction _next) =>
         {
             res.send(req.body is null ? "null" : "not-null");
+            return Task.CompletedTask;
         });
 
         var context = test_runtime_utils.createContext("POST", "/skip", "a=1&a=2", "application/x-www-form-urlencoded");
@@ -66,7 +67,11 @@ public class coverage_matrix_express_tests
     {
         var app = express.create();
         app.use(express.json());
-        app.post("/json", static (Request req, Response res) => res.send(req.body is null ? "null" : "not-null"));
+        app.post("/json", static (Request req, Response res, NextFunction _next) =>
+        {
+            res.send(req.body is null ? "null" : "not-null");
+            return Task.CompletedTask;
+        });
 
         var missingContentType = test_runtime_utils.createContext("POST", "/json", "{\"a\":1}");
         await test_runtime_utils.run(app, missingContentType);
@@ -82,11 +87,12 @@ public class coverage_matrix_express_tests
     {
         var app = express.create();
         app.use(express.urlencoded());
-        app.post("/form", static (Request req, Response res) =>
+        app.post("/form", static (Request req, Response res, NextFunction _next) =>
         {
             var body = Assert.IsType<Dictionary<string, object?>>(req.body);
             var values = Assert.IsType<string[]>(body["a"]);
             res.send($"{values[0]}-{values[1]}");
+            return Task.CompletedTask;
         });
 
         var context = test_runtime_utils.createContext("POST", "/form", "a=1&a=2", "application/x-www-form-urlencoded");
@@ -119,7 +125,11 @@ public class coverage_matrix_express_tests
         {
             var app = express.create();
             app.use(express.@static(root, new StaticOptions { index = "index.html" }));
-            app.get("/{*splat}", static (Request _, Response res) => res.send("next"));
+            app.get("/{*splat}", static (Request _req, Response res, NextFunction _next) =>
+            {
+                res.send("next");
+                return Task.CompletedTask;
+            });
 
             var indexContext = test_runtime_utils.createContext("GET", "/");
             await test_runtime_utils.run(app, indexContext);
@@ -135,14 +145,22 @@ public class coverage_matrix_express_tests
 
             var appWithoutStringIndex = express.create();
             appWithoutStringIndex.use(express.@static(root, new StaticOptions { index = false }));
-            appWithoutStringIndex.get("/{*splat}", (Action<Request, Response>)(static (_, res) => res.send("next")));
+            appWithoutStringIndex.get("/{*splat}", static (Request _req, Response res, NextFunction _next) =>
+            {
+                res.send("next");
+                return Task.CompletedTask;
+            });
             var rootFallbackContext = test_runtime_utils.createContext("GET", "/");
             await test_runtime_utils.run(appWithoutStringIndex, rootFallbackContext);
             Assert.Equal("next", test_runtime_utils.readBody(rootFallbackContext));
 
             var appWithDefaultIndex = express.create();
             appWithDefaultIndex.use(express.@static(root));
-            appWithDefaultIndex.get("/{*splat}", (Action<Request, Response>)(static (_, res) => res.send("next")));
+            appWithDefaultIndex.get("/{*splat}", static (Request _req, Response res, NextFunction _next) =>
+            {
+                res.send("next");
+                return Task.CompletedTask;
+            });
             var defaultIndexFallbackContext = test_runtime_utils.createContext("GET", "/");
             await test_runtime_utils.run(appWithDefaultIndex, defaultIndexFallbackContext);
             Assert.Equal("next", test_runtime_utils.readBody(defaultIndexFallbackContext));
@@ -158,7 +176,11 @@ public class coverage_matrix_express_tests
         var app = express.create();
         var options = new JsonOptions { type = configuredType };
         app.use(express.json(options));
-        app.post("/json", static (Request req, Response res) => res.json(req.body));
+        app.post("/json", static (Request req, Response res, NextFunction _next) =>
+        {
+            res.json(req.body);
+            return Task.CompletedTask;
+        });
 
         var context = test_runtime_utils.createContext("POST", "/json", payload, contentType);
         if (parseHeaderValue is not null)
