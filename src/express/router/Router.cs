@@ -64,6 +64,16 @@ public class Router : RoutingHost<Router>
         return new Route(this, path);
     }
 
+    public Router use(Router callback)
+    {
+        return use((object)"/", callback);
+    }
+
+    public Router use(string path, Router callback)
+    {
+        return use((object)path, callback);
+    }
+
     internal override Router use(object callback, params object[] callbacks)
     {
         return addMiddleware("/", callback, callbacks);
@@ -97,7 +107,7 @@ public class Router : RoutingHost<Router>
                 continue;
 
             foreach (var kvp in extractedParams)
-                request.@params[kvp.Key] = kvp.Value;
+                request.@params.Set(kvp.Key, kvp.Value);
 
             if (!layer.middleware)
                 request.route = new Route(this, layer.path);
@@ -326,7 +336,7 @@ public class Router : RoutingHost<Router>
 
     private async Task runParamHandlers(Request request, Response response, HashSet<string> processedParams)
     {
-        foreach (var kvp in request.@params)
+        foreach (var kvp in request.@params.Entries())
         {
             var key = $"{kvp.Key}:{kvp.Value}";
             if (!processedParams.Add(key))

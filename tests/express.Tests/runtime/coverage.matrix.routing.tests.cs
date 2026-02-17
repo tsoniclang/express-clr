@@ -197,7 +197,7 @@ public class coverage_matrix_routing_tests
         });
         app.get("/api/:id", static (Request req, Response res) =>
         {
-            var id = req.@params["id"]?.ToString() ?? string.Empty;
+            var id = req.@params["id"] ?? string.Empty;
             res.send(id);
         });
         app.use("/prefix", static (Request _, Response res, NextFunction next) =>

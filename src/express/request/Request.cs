@@ -22,7 +22,7 @@ public class Request
     public List<string> ips { get; set; } = new();
     public string method { get; set; } = "GET";
     public string originalUrl { get; set; } = "/";
-    public Dictionary<string, object?> @params { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+    public Params @params { get; } = new();
     public string path { get; set; } = "/";
     public string protocol { get; set; } = "http";
     public Dictionary<string, object?> query { get; set; } = new(StringComparer.OrdinalIgnoreCase);
@@ -139,10 +139,7 @@ public class Request
 
     public string? param(string name)
     {
-        if (@params.TryGetValue(name, out var value))
-            return value?.ToString();
-
-        return null;
+        return @params[name];
     }
 
     public object? @is(params string[] types)

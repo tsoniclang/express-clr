@@ -79,6 +79,15 @@ public class express_api_surface_tests
     }
 
     [Fact]
+    public void request_params_is_params_type()
+    {
+        var type = typeof(Request);
+        var prop = type.GetProperty("params", BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static);
+        Assert.NotNull(prop);
+        Assert.Equal(typeof(Params), prop!.PropertyType);
+    }
+
+    [Fact]
     public void response_exposes_expected_properties_and_methods()
     {
         var type = typeof(Response);
@@ -111,6 +120,29 @@ public class express_api_surface_tests
         };
         foreach (var method in methods)
             assertMethod(type, method);
+    }
+
+    [Fact]
+    public void router_supports_mounting_routers_via_use_overloads()
+    {
+        var type = typeof(Router);
+        var methods = type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static);
+
+        var hasPathless = methods.Any(m =>
+        {
+            if (!string.Equals(m.Name, "use", StringComparison.Ordinal)) return false;
+            var ps = m.GetParameters();
+            return ps.Length == 1 && ps[0].ParameterType == typeof(Router);
+        });
+        Assert.True(hasPathless, "Router is missing overload: use(Router)");
+
+        var hasPathful = methods.Any(m =>
+        {
+            if (!string.Equals(m.Name, "use", StringComparison.Ordinal)) return false;
+            var ps = m.GetParameters();
+            return ps.Length == 2 && ps[0].ParameterType == typeof(string) && ps[1].ParameterType == typeof(Router);
+        });
+        Assert.True(hasPathful, "Router is missing overload: use(string, Router)");
     }
 
     private static void assertMethod([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] Type type, string methodName)
