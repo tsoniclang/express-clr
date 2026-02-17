@@ -20,9 +20,10 @@ public class router_runtime_tests
             await next(null);
         }));
 
-        app.get("/ping", static (Request _, Response res) =>
+        app.get("/ping", static (Request _req, Response res, NextFunction _next) =>
         {
             res.status(200).send("pong");
+            return Task.CompletedTask;
         });
 
         var context = createContext("GET", "/ping");
@@ -46,9 +47,10 @@ public class router_runtime_tests
                 return Task.CompletedTask;
             }));
 
-        app.get("/item", static (Request _, Response res) =>
+        app.get("/item", static (Request _req, Response res, NextFunction _next) =>
         {
             res.send("ok");
+            return Task.CompletedTask;
         });
 
         var context = createContext("GET", "/item");
@@ -70,7 +72,11 @@ public class router_runtime_tests
         });
 
         app.get("/users/:id", (RequestHandler)(static (_, _, next) => next(null)));
-        app.get("/users/:id", static (Request _, Response res) => res.send("done"));
+        app.get("/users/:id", static (Request _req, Response res, NextFunction _next) =>
+        {
+            res.send("done");
+            return Task.CompletedTask;
+        });
 
         var context = createContext("GET", "/users/42");
         await app.handle(context, app);
@@ -87,7 +93,11 @@ public class router_runtime_tests
         var mounted = false;
 
         child.mount += _ => mounted = true;
-        child.get("/hello", static (Request _, Response res) => res.send("world"));
+        child.get("/hello", static (Request _req, Response res, NextFunction _next) =>
+        {
+            res.send("world");
+            return Task.CompletedTask;
+        });
 
         app.use("/api", child);
 
@@ -104,8 +114,16 @@ public class router_runtime_tests
         var app = express.create();
 
         app.route("/events")
-            .get(static (Request _, Response res) => res.send("get"))
-            .post(static (Request _, Response res) => res.send("post"));
+            .get(static (Request _req, Response res, NextFunction _next) =>
+            {
+                res.send("get");
+                return Task.CompletedTask;
+            })
+            .post(static (Request _req, Response res, NextFunction _next) =>
+            {
+                res.send("post");
+                return Task.CompletedTask;
+            });
 
         var getContext = createContext("GET", "/events");
         await app.handle(getContext, app);

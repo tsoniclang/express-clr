@@ -195,10 +195,11 @@ public class coverage_matrix_routing_tests
             res.set("x-splat", "on");
             return next(null);
         });
-        app.get("/api/:id", static (Request req, Response res) =>
+        app.get("/api/:id", static (Request req, Response res, NextFunction _next) =>
         {
             var id = req.@params["id"] ?? string.Empty;
             res.send(id);
+            return Task.CompletedTask;
         });
         app.use("/prefix", static (Request _, Response res, NextFunction next) =>
         {

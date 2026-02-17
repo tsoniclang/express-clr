@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -13,6 +14,95 @@ public static class express
     public static Application create() => new();
     public static Application application() => new();
     public static Application app() => new();
+
+    public static RequestHandler cookieParser(string secret)
+    {
+        if (string.IsNullOrWhiteSpace(secret))
+            throw new ArgumentException("secret is required.", nameof(secret));
+
+        return async (req, _, next) =>
+        {
+            if (req.app is not null)
+                req.app.set("cookie secret", secret);
+
+            req.signed = true;
+
+            var toRemove = new List<string>();
+            foreach (var kvp in req.cookies.Entries())
+            {
+                if (CookieSignature.unsign(kvp.Value, secret) is not { } unsigned)
+                    continue;
+
+                req.signedCookies.Set(kvp.Key, unsigned);
+                toRemove.Add(kvp.Key);
+            }
+
+            foreach (var key in toRemove)
+                req.cookies.Remove(key);
+
+            await next(null).ConfigureAwait(false);
+        };
+    }
+
+    public static RequestHandler cors(CorsOptions? options = null)
+    {
+        var resolved = options ?? new CorsOptions();
+        return async (req, res, next) =>
+        {
+            var origin = req.get("Origin");
+            if (string.IsNullOrWhiteSpace(origin))
+            {
+                await next(null).ConfigureAwait(false);
+                return;
+            }
+
+            var allowAny = resolved.origins is null || resolved.origins.Length == 0;
+            var allowed = allowAny || resolved.origins!.Contains(origin, StringComparer.OrdinalIgnoreCase);
+            if (!allowed)
+            {
+                await next(null).ConfigureAwait(false);
+                return;
+            }
+
+            var allowOrigin = allowAny && !resolved.credentials ? "*" : origin;
+            res.set("Access-Control-Allow-Origin", allowOrigin);
+            if (allowOrigin != "*")
+                res.vary("Origin");
+
+            if (resolved.credentials)
+                res.set("Access-Control-Allow-Credentials", "true");
+
+            if (resolved.exposedHeaders is { Length: > 0 })
+                res.set("Access-Control-Expose-Headers", string.Join(", ", resolved.exposedHeaders));
+
+            if (string.Equals(req.method, "OPTIONS", StringComparison.OrdinalIgnoreCase))
+            {
+                var methods = resolved.methods;
+                if (methods is { Length: > 0 })
+                    res.set("Access-Control-Allow-Methods", string.Join(", ", methods));
+                else if (req.get("Access-Control-Request-Method") is { } requestedMethod && !string.IsNullOrWhiteSpace(requestedMethod))
+                    res.set("Access-Control-Allow-Methods", requestedMethod);
+                else
+                    res.set("Access-Control-Allow-Methods", "GET, HEAD, PUT, PATCH, POST, DELETE");
+
+                if (resolved.allowedHeaders is { Length: > 0 })
+                    res.set("Access-Control-Allow-Headers", string.Join(", ", resolved.allowedHeaders));
+                else if (req.get("Access-Control-Request-Headers") is { } requestedHeaders && !string.IsNullOrWhiteSpace(requestedHeaders))
+                    res.set("Access-Control-Allow-Headers", requestedHeaders);
+
+                if (resolved.maxAgeSeconds is { } maxAge && maxAge > 0)
+                    res.set("Access-Control-Max-Age", maxAge.ToString());
+
+                if (!resolved.preflightContinue)
+                {
+                    res.status(resolved.optionsSuccessStatus).end();
+                    return;
+                }
+            }
+
+            await next(null).ConfigureAwait(false);
+        };
+    }
 
     public static RequestHandler json(JsonOptions? options = null)
     {
@@ -56,6 +146,11 @@ public static class express
     public static Router Router(RouterOptions? options = null)
     {
         return new Router(options);
+    }
+
+    public static Multipart multipart(MultipartOptions? options = null)
+    {
+        return new Multipart(options);
     }
 
     public static RequestHandler @static(string root, StaticOptions? options = null)

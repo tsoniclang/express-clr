@@ -73,7 +73,51 @@ public class Response
         if (options?.encode is { } encoder)
             payload = encoder(payload);
 
-        var cookie = $"{name}={payload}; Path={options?.path ?? "/"}";
+        if (options?.signed == true)
+        {
+            var secret = req?.app?.get("cookie secret") as string;
+            if (string.IsNullOrWhiteSpace(secret))
+                throw new InvalidOperationException("Cannot set signed cookie without a secret. Install cookieParser() first.");
+            payload = CookieSignature.sign(payload, secret!);
+        }
+
+        var segments = new List<string>
+        {
+            $"{name}={payload}",
+            $"Path={options?.path ?? "/"}"
+        };
+
+        if (!string.IsNullOrWhiteSpace(options?.domain))
+            segments.Add($"Domain={options.domain}");
+
+        DateTime? expires = options?.expires;
+        if (expires is null && options?.maxAge is { } maxAgeMs)
+            expires = DateTime.UtcNow.AddMilliseconds(maxAgeMs);
+
+        if (expires is { } when)
+            segments.Add($"Expires={when.ToUniversalTime():R}");
+
+        if (options?.maxAge is { } maxAge)
+            segments.Add($"Max-Age={Math.Max(0, (long)(maxAge / 1000))}");
+
+        if (options?.httpOnly == true)
+            segments.Add("HttpOnly");
+
+        if (options?.secure == true)
+            segments.Add("Secure");
+
+        if (options?.sameSite is string sameSiteString && !string.IsNullOrWhiteSpace(sameSiteString))
+            segments.Add($"SameSite={sameSiteString}");
+        else if (options?.sameSite is bool sameSiteBool && sameSiteBool)
+            segments.Add("SameSite=Strict");
+
+        if (!string.IsNullOrWhiteSpace(options?.priority))
+            segments.Add($"Priority={options.priority}");
+
+        if (options?.partitioned == true)
+            segments.Add("Partitioned");
+
+        var cookie = string.Join("; ", segments);
         append("Set-Cookie", cookie);
         return this;
     }
@@ -434,6 +478,15 @@ public class Response
                 {
                     writer.WritePropertyName(kvp.Key);
                     writeJsonValue(writer, kvp.Value);
+                }
+                writer.WriteEndObject();
+                return;
+            case Cookies cookies:
+                writer.WriteStartObject();
+                foreach (var kvp in cookies.Entries())
+                {
+                    writer.WritePropertyName(kvp.Key);
+                    writer.WriteStringValue(kvp.Value);
                 }
                 writer.WriteEndObject();
                 return;

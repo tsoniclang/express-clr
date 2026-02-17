@@ -48,6 +48,31 @@ public sealed class UrlEncodedOptions
     public int depth { get; set; } = 32;
 }
 
+public sealed class MultipartField
+{
+    public string name { get; set; } = string.Empty;
+    public int? maxCount { get; set; }
+}
+
+public sealed class MultipartOptions
+{
+    public string type { get; set; } = "multipart/form-data";
+    public int? maxFileCount { get; set; }
+    public long? maxFileSizeBytes { get; set; }
+}
+
+public sealed class CorsOptions
+{
+    public string[]? origins { get; set; }
+    public bool credentials { get; set; }
+    public string[]? methods { get; set; }
+    public string[]? allowedHeaders { get; set; }
+    public string[]? exposedHeaders { get; set; }
+    public int? maxAgeSeconds { get; set; }
+    public bool preflightContinue { get; set; }
+    public int optionsSuccessStatus { get; set; } = 204;
+}
+
 public sealed class StaticOptions
 {
     public string dotfiles { get; set; } = "ignore";
