@@ -7,11 +7,11 @@ using Xunit;
 
 namespace express.Tests.runtime;
 
-public class router_runtime_tests
-{
-    [Fact]
-    public async Task middleware_and_route_handlers_run_in_order()
+    public class router_runtime_tests
     {
+        [Fact]
+        public async Task middleware_and_route_handlers_run_in_order()
+        {
         var app = express.create();
 
         app.use((RequestHandler)(async (_, res, next) =>
@@ -31,13 +31,39 @@ public class router_runtime_tests
 
         Assert.Equal(200, context.Response.StatusCode);
         Assert.Equal("pong", readBody(context));
-        Assert.Equal("on", context.Response.Headers["x-mw"].ToString());
-    }
+            Assert.Equal("on", context.Response.Headers["x-mw"].ToString());
+        }
 
-    [Fact]
-    public async Task next_route_skips_remaining_handlers_for_current_route()
-    {
-        var app = express.create();
+        [Fact]
+        public async Task get_slash_matches_only_root_path()
+        {
+            var app = express.create();
+
+            app.get("/", static (Request _req, Response res, NextFunction _next) =>
+            {
+                res.send("root");
+                return Task.CompletedTask;
+            });
+
+            app.get("/items/:id", static (Request req, Response res, NextFunction _next) =>
+            {
+                res.send(req.@params["id"]?.ToString() ?? "");
+                return Task.CompletedTask;
+            });
+
+            var rootContext = createContext("GET", "/");
+            await app.handle(rootContext, app);
+            Assert.Equal("root", readBody(rootContext));
+
+            var itemContext = createContext("GET", "/items/123");
+            await app.handle(itemContext, app);
+            Assert.Equal("123", readBody(itemContext));
+        }
+
+        [Fact]
+        public async Task next_route_skips_remaining_handlers_for_current_route()
+        {
+            var app = express.create();
 
         app.get("/item",
             (RequestHandler)(async (_, _, next) => await next("route")),

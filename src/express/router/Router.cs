@@ -273,13 +273,13 @@ public class Router : RoutingHost<Router>
         return false;
     }
 
-    private static bool matchesStringPath(string pathSpec, string requestPath, bool middleware, Dictionary<string, object?> parameters)
-    {
-        var normalizedPath = normalizePath(requestPath);
-        var normalizedSpec = normalizePath(pathSpec);
+	    private static bool matchesStringPath(string pathSpec, string requestPath, bool middleware, Dictionary<string, object?> parameters)
+	    {
+	        var normalizedPath = normalizePath(requestPath);
+	        var normalizedSpec = normalizePath(pathSpec);
 
-        if (normalizedSpec == "/" || string.IsNullOrWhiteSpace(normalizedSpec))
-            return true;
+	        if (normalizedSpec == "/" || string.IsNullOrWhiteSpace(normalizedSpec))
+	            return middleware || normalizedPath == "/";
 
         if (normalizedSpec.Contains("{*splat}", StringComparison.Ordinal))
             return normalizedPath.StartsWith(normalizedSpec.Replace("{*splat}", string.Empty), StringComparison.OrdinalIgnoreCase);
