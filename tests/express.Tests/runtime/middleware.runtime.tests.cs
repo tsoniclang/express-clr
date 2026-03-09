@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using express;
 using Microsoft.AspNetCore.Http;
+using Tsonic.JSRuntime;
 using Xunit;
 
 namespace express.Tests.runtime;
@@ -45,8 +46,8 @@ public class middleware_runtime_tests
         app.use(express.raw());
         app.post("/raw", (Action<Request, Response>)(static (req, res) =>
         {
-            var bytes = Assert.IsType<byte[]>(req.body);
-            res.send(bytes.Length.ToString());
+            var bytes = Assert.IsType<Uint8Array>(req.body);
+            res.send(bytes.length.ToString());
         }));
 
         var context = createContext("POST", "/raw", "abcd", "application/octet-stream");

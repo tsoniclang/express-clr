@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.WebUtilities;
+using Tsonic.JSRuntime;
 
 namespace express;
 
@@ -122,6 +123,7 @@ public static class express
                 return;
             }
 
+            options?.verify?.Invoke(req, req.res ?? new Response(), new Uint8Array(Encoding.UTF8.GetBytes(body)), "utf-8");
             req.body = parseJsonBody(body);
             await next(null).ConfigureAwait(false);
         };
@@ -138,7 +140,9 @@ public static class express
             }
 
             var bytes = await readBodyBytes(req).ConfigureAwait(false);
-            req.body = bytes;
+            var payload = new Uint8Array(bytes);
+            options?.verify?.Invoke(req, req.res ?? new Response(), payload, null);
+            req.body = payload;
             await next(null).ConfigureAwait(false);
         };
     }
@@ -190,7 +194,10 @@ public static class express
                 return;
             }
 
-            req.body = await readBody(req).ConfigureAwait(false);
+            var bytes = await readBodyBytes(req).ConfigureAwait(false);
+            var payload = new Uint8Array(bytes);
+            options?.verify?.Invoke(req, req.res ?? new Response(), payload, "utf-8");
+            req.body = Encoding.UTF8.GetString(bytes);
             await next(null).ConfigureAwait(false);
         };
     }
@@ -205,7 +212,10 @@ public static class express
                 return;
             }
 
-            var body = await readBody(req).ConfigureAwait(false);
+            var bytes = await readBodyBytes(req).ConfigureAwait(false);
+            var payload = new Uint8Array(bytes);
+            options?.verify?.Invoke(req, req.res ?? new Response(), payload, "utf-8");
+            var body = Encoding.UTF8.GetString(bytes);
             var parsed = QueryHelpers.ParseQuery(body);
             var result = new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase);
             foreach (var item in parsed)

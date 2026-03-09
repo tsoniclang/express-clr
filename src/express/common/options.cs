@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Tsonic.JSRuntime;
 
 namespace express;
 
@@ -42,23 +43,48 @@ public sealed class UrlEncodedOptions
     public bool extended { get; set; }
     public bool inflate { get; set; } = true;
     public object? limit { get; set; } = "100kb";
-    public int parameterLimit { get; set; } = 1000;
+    private int _parameterLimit = 1000;
+    public double parameterLimit
+    {
+        get => js_interop.fromInt32(_parameterLimit);
+        set => _parameterLimit = js_interop.toInt32(nameof(parameterLimit), value);
+    }
     public object? type { get; set; } = "application/x-www-form-urlencoded";
     public VerifyBodyHandler? verify { get; set; }
-    public int depth { get; set; } = 32;
+    private int _depth = 32;
+    public double depth
+    {
+        get => js_interop.fromInt32(_depth);
+        set => _depth = js_interop.toInt32(nameof(depth), value);
+    }
 }
 
 public sealed class MultipartField
 {
     public string name { get; set; } = string.Empty;
-    public int? maxCount { get; set; }
+    private int? _maxCount;
+    public double? maxCount
+    {
+        get => js_interop.fromInt32(_maxCount);
+        set => _maxCount = js_interop.toNullableInt32(nameof(maxCount), value);
+    }
 }
 
 public sealed class MultipartOptions
 {
     public string type { get; set; } = "multipart/form-data";
-    public int? maxFileCount { get; set; }
-    public long? maxFileSizeBytes { get; set; }
+    private int? _maxFileCount;
+    private long? _maxFileSizeBytes;
+    public double? maxFileCount
+    {
+        get => js_interop.fromInt32(_maxFileCount);
+        set => _maxFileCount = js_interop.toNullableInt32(nameof(maxFileCount), value);
+    }
+    public double? maxFileSizeBytes
+    {
+        get => js_interop.fromInt64(_maxFileSizeBytes);
+        set => _maxFileSizeBytes = js_interop.toNullableInt64(nameof(maxFileSizeBytes), value);
+    }
 }
 
 public sealed class CorsOptions
@@ -68,9 +94,19 @@ public sealed class CorsOptions
     public string[]? methods { get; set; }
     public string[]? allowedHeaders { get; set; }
     public string[]? exposedHeaders { get; set; }
-    public int? maxAgeSeconds { get; set; }
+    private int? _maxAgeSeconds;
+    public double? maxAgeSeconds
+    {
+        get => js_interop.fromInt32(_maxAgeSeconds);
+        set => _maxAgeSeconds = js_interop.toNullableInt32(nameof(maxAgeSeconds), value);
+    }
     public bool preflightContinue { get; set; }
-    public int optionsSuccessStatus { get; set; } = 204;
+    private int _optionsSuccessStatus = 204;
+    public double optionsSuccessStatus
+    {
+        get => js_interop.fromInt32(_optionsSuccessStatus);
+        set => _optionsSuccessStatus = js_interop.toInt32(nameof(optionsSuccessStatus), value);
+    }
 }
 
 public sealed class StaticOptions
@@ -117,9 +153,9 @@ public sealed class CookieOptions
 {
     public string? domain { get; set; }
     public CookieEncoder? encode { get; set; }
-    public DateTime? expires { get; set; }
+    public Date? expires { get; set; }
     public bool httpOnly { get; set; }
-    public long? maxAge { get; set; }
+    public double? maxAge { get; set; }
     public string path { get; set; } = "/";
     public bool partitioned { get; set; }
     public string? priority { get; set; }
@@ -135,18 +171,23 @@ public sealed class RangeOptions
 
 public sealed class ByteRange
 {
-    public long start { get; set; }
-    public long end { get; set; }
+    public double start { get; set; }
+    public double end { get; set; }
 }
 
 public sealed class RangeResult
 {
     public string type { get; set; } = "bytes";
-    public List<ByteRange> ranges { get; } = new();
+    public ByteRange[] ranges { get; set; } = Array.Empty<ByteRange>();
+
+    internal void add(ByteRange range)
+    {
+        ranges = [.. ranges, range];
+    }
 }
 
 public sealed class FileStat
 {
-    public long size { get; set; }
-    public DateTime modifiedAt { get; set; } = DateTime.UtcNow;
+    public double size { get; set; }
+    public Date modifiedAt { get; set; } = new();
 }

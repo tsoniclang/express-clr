@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using express;
+using Tsonic.JSRuntime;
 using Xunit;
 
 namespace express.Tests.runtime;
@@ -285,7 +286,7 @@ public class coverage_matrix_routing_tests
         Assert.Equal(1, count);
 
         app.get("/boom", (RequestHandler)(static (_, _, _) => throw new InvalidOperationException("boom")));
-        app.use((Func<Exception, Request, Response, NextFunction, Task>)(static (_, __, res, ___) =>
+        app.use((Func<Error, Request, Response, NextFunction, Task>)(static (_, __, res, ___) =>
         {
             res.status(500).send("handled");
             return Task.CompletedTask;
@@ -387,7 +388,7 @@ public class coverage_matrix_routing_tests
 
         app.get("/badinvoke", (object)(Func<int, int, int, int>)((_, _, _) => 1));
         app.get("/badinvoke", (Action<Request, Response>)(static (_, res) => res.send("fallback")));
-        app.use((Func<Exception, Request, Response, NextFunction, Task>)(static (_, __, res, ___) =>
+        app.use((Func<Error, Request, Response, NextFunction, Task>)(static (_, __, res, ___) =>
         {
             res.status(500).send("invoke-error");
             return Task.CompletedTask;

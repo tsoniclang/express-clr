@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using express;
 using Microsoft.AspNetCore.Http;
+using Tsonic.Runtime;
 using Xunit;
 
 namespace express.Tests.runtime;
@@ -94,11 +95,13 @@ public class coverage_matrix_request_tests
         Assert.Equal("json", req.@is("json", "text"));
 
         Assert.Equal(-1, req.range(0));
-        var range = Assert.IsType<RangeResult>(req.range(10));
-        Assert.Equal("bytes", range.type);
-        Assert.Single(range.ranges);
-        Assert.Equal(0, range.ranges[0].start);
-        Assert.Equal(9, range.ranges[0].end);
+        var range = Assert.IsType<Union<RangeResult, int>>(req.range(10));
+        Assert.True(range != -1);
+        var accepted = range.As1();
+        Assert.Equal("bytes", accepted.type);
+        Assert.Single(accepted.ranges);
+        Assert.Equal(0, accepted.ranges[0].start);
+        Assert.Equal(9, accepted.ranges[0].end);
     }
 
     [Fact]

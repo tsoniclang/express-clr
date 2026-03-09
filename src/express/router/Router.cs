@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Tsonic.JSRuntime;
 
 namespace express;
 
@@ -93,7 +94,7 @@ public class Router : RoutingHost<Router>
 
         var routePath = request.path;
         var requestMethod = request.method.ToUpperInvariant();
-        Exception? error = null;
+        Error? error = null;
 
         foreach (var layer in _layers)
         {
@@ -352,9 +353,9 @@ public class Router : RoutingHost<Router>
         }
     }
 
-    private static async Task<(bool ended, string? control, Exception? error)> invokeHandlers(List<object> handlers, Request request, Response response, Exception? currentError)
+    private static async Task<(bool ended, string? control, Error? error)> invokeHandlers(List<object> handlers, Request request, Response response, Error? currentError)
     {
-        Exception? error = currentError;
+        Error? error = currentError;
         foreach (var handler in handlers)
         {
             var nextCalled = false;
@@ -410,16 +411,16 @@ public class Router : RoutingHost<Router>
                         case ErrorRequestHandler callback:
                             await callback(error, request, response, next).ConfigureAwait(false);
                             break;
-                        case Func<Exception, Request, Response, NextFunction, Task> callback:
+                        case Func<Error, Request, Response, NextFunction, Task> callback:
                             await callback(error, request, response, next).ConfigureAwait(false);
                             break;
-                        case Func<Exception, Request, Response, NextFunction, ValueTask> callback:
+                        case Func<Error, Request, Response, NextFunction, ValueTask> callback:
                             await callback(error, request, response, next).ConfigureAwait(false);
                             break;
-                        case Func<Exception, Request, Response, NextFunction, object?> callback:
+                        case Func<Error, Request, Response, NextFunction, object?> callback:
                             _ = callback(error, request, response, next);
                             break;
-                        case Action<Exception, Request, Response, NextFunction> callback:
+                        case Action<Error, Request, Response, NextFunction> callback:
                             callback(error, request, response, next);
                             break;
                         default:
@@ -438,7 +439,7 @@ public class Router : RoutingHost<Router>
             }
             catch (Exception ex)
             {
-                error = ex;
+                error = js_interop.fromException(ex);
                 continue;
             }
         }

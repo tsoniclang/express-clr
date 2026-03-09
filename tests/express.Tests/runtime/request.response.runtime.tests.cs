@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using express;
+using Tsonic.Runtime;
 using Xunit;
 
 namespace express.Tests.runtime;
@@ -36,11 +37,13 @@ public class request_response_runtime_tests
         Assert.Equal("gzip", req.acceptsEncodings("gzip", "br"));
         Assert.Equal("en", req.acceptsLanguages("en", "fr"));
 
-        var result = Assert.IsType<RangeResult>(req.range(10));
-        Assert.Equal("bytes", result.type);
-        Assert.Single(result.ranges);
-        Assert.Equal(0, result.ranges[0].start);
-        Assert.Equal(9, result.ranges[0].end);
+        var result = Assert.IsType<Union<RangeResult, int>>(req.range(10));
+        Assert.True(result != -1);
+        var accepted = result.As1();
+        Assert.Equal("bytes", accepted.type);
+        Assert.Single(accepted.ranges);
+        Assert.Equal(0, accepted.ranges[0].start);
+        Assert.Equal(9, accepted.ranges[0].end);
     }
 
     [Fact]

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Tsonic.JSRuntime;
 using express;
 using Xunit;
 
@@ -184,7 +185,7 @@ public class coverage_matrix_infrastructure_tests
         {
             domain = "example.com",
             encode = static value => value,
-            expires = DateTime.UtcNow,
+            expires = new Date(Date.now()),
             httpOnly = true,
             maxAge = 5000,
             path = "/admin",
@@ -215,13 +216,13 @@ public class coverage_matrix_infrastructure_tests
 
         var rangeResult = new RangeResult();
         rangeResult.type = "bytes";
-        rangeResult.ranges.Add(byteRange);
+        rangeResult.ranges = [byteRange];
         Assert.Equal("bytes", rangeResult.type);
         Assert.Single(rangeResult.ranges);
 
-        var stat = new FileStat { size = 9, modifiedAt = DateTime.UtcNow };
+        var stat = new FileStat { size = 9, modifiedAt = new Date(Date.now()) };
         Assert.Equal(9, stat.size);
-        Assert.True(stat.modifiedAt > DateTime.UnixEpoch);
+        Assert.Contains("GMT", stat.modifiedAt.toUTCString());
 
         var request = new Request { signed = true };
         Assert.True(request.signed);
@@ -235,10 +236,11 @@ public class coverage_matrix_infrastructure_tests
         Assert.False(cleanServer.listening);
 
         var server = new AppServer(1, "127.0.0.1", null, () => throw new InvalidOperationException("close"));
-        Exception? callbackError = null;
+        Error? callbackError = null;
         server.close(err => callbackError = err);
 
         Assert.NotNull(callbackError);
-        Assert.IsType<InvalidOperationException>(callbackError);
+        Assert.IsType<Error>(callbackError);
+        Assert.IsType<InvalidOperationException>(callbackError!.InnerException);
     }
 }

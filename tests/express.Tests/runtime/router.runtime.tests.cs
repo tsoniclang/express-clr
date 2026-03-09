@@ -3,6 +3,7 @@ using System.Text;
 using System.Threading.Tasks;
 using express;
 using Microsoft.AspNetCore.Http;
+using Tsonic.JSRuntime;
 using Xunit;
 
 namespace express.Tests.runtime;
@@ -166,7 +167,7 @@ namespace express.Tests.runtime;
         var app = express.create();
 
         app.get("/boom", (RequestHandler)(static (_, _, _) => throw new InvalidDataException("boom")));
-        app.use((Func<System.Exception, Request, Response, NextFunction, Task>)(static (_, __, res, ___) =>
+        app.use((Func<Error, Request, Response, NextFunction, Task>)(static (_, __, res, ___) =>
         {
             res.status(500).send("handled");
             return Task.CompletedTask;
