@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.StaticFiles;
+using Tsonic.JSRuntime;
 
 namespace express;
 
@@ -15,10 +16,20 @@ public class Response
     private readonly HttpContext? _context;
     private readonly Dictionary<string, string> _headers = new(StringComparer.OrdinalIgnoreCase);
     private readonly FileExtensionContentTypeProvider _contentTypes = new();
+    private int _statusCode = StatusCodes.Status200OK;
 
     public Request? req { get; set; }
     public Dictionary<string, object?> locals { get; } = new(StringComparer.OrdinalIgnoreCase);
-    public int statusCode { get; private set; } = StatusCodes.Status200OK;
+    public double statusCode
+    {
+        get => js_interop.fromInt32(_statusCode);
+        set
+        {
+            _statusCode = js_interop.toInt32(nameof(statusCode), value);
+            if (_context is not null)
+                _context.Response.StatusCode = _statusCode;
+        }
+    }
     public bool headersSent { get; private set; }
     public Application? app => req?.app;
 
@@ -30,7 +41,7 @@ public class Response
     {
         _context = context;
         req = request;
-        statusCode = context.Response.StatusCode;
+        _statusCode = context.Response.StatusCode;
     }
 
     internal static Response fromHttpContext(HttpContext context, Request request)
@@ -90,15 +101,15 @@ public class Response
         if (!string.IsNullOrWhiteSpace(options?.domain))
             segments.Add($"Domain={options.domain}");
 
-        DateTime? expires = options?.expires;
+        Date? expires = options?.expires;
         if (expires is null && options?.maxAge is { } maxAgeMs)
-            expires = DateTime.UtcNow.AddMilliseconds(maxAgeMs);
+            expires = new Date(Date.now() + maxAgeMs);
 
         if (expires is { } when)
-            segments.Add($"Expires={when.ToUniversalTime():R}");
+            segments.Add($"Expires={when.toUTCString()}");
 
         if (options?.maxAge is { } maxAge)
-            segments.Add($"Max-Age={Math.Max(0, (long)(maxAge / 1000))}");
+            segments.Add($"Max-Age={System.Math.Max(0, (long)(maxAge / 1000))}");
 
         if (options?.httpOnly == true)
             segments.Add("HttpOnly");
@@ -125,11 +136,11 @@ public class Response
     public Response clearCookie(string name, CookieOptions? options = null)
     {
         var reset = options ?? new CookieOptions();
-        reset.expires = DateTime.UnixEpoch;
+        reset.expires = new Date(0);
         return cookie(name, string.Empty, reset);
     }
 
-    public Response download(string path, string? filename = null, DownloadOptions? options = null, Action<Exception?>? fn = null)
+    public Response download(string path, string? filename = null, DownloadOptions? options = null, Action<Error?>? fn = null)
     {
         try
         {
@@ -149,7 +160,7 @@ public class Response
         }
         catch (Exception ex)
         {
-            fn?.Invoke(ex);
+            fn?.Invoke(js_interop.fromException(ex));
         }
 
         return this;
@@ -163,7 +174,7 @@ public class Response
 
         headersSent = true;
         if (_context is not null)
-            _context.Response.StatusCode = statusCode;
+            _context.Response.StatusCode = _statusCode;
         callback?.Invoke();
         return this;
     }
@@ -221,14 +232,15 @@ public class Response
 
     public Response redirect(string path) => redirect(StatusCodes.Status302Found, path);
 
-    public Response redirect(int status, string path)
+    public Response redirect(double status, string path)
     {
-        statusCode = status;
+        var actualStatus = js_interop.toInt32(nameof(status), status);
+        _statusCode = actualStatus;
         location(path);
         headersSent = true;
         if (_context is not null)
         {
-            _context.Response.StatusCode = status;
+            _context.Response.StatusCode = actualStatus;
             _context.Response.Headers.Location = path;
         }
 
@@ -257,7 +269,7 @@ public class Response
         return send($"<rendered:{view}>");
     }
 
-    public Response render(string view, Action<Exception?, string?> callback)
+    public Response render(string view, Action<Error?, string?> callback)
     {
         if (app?.resolveEngine(view) is { } engine)
         {
@@ -269,7 +281,7 @@ public class Response
         return this;
     }
 
-    public Response render(string view, Dictionary<string, object?> viewLocals, Action<Exception?, string?> callback)
+    public Response render(string view, Dictionary<string, object?> viewLocals, Action<Error?, string?> callback)
     {
         if (app?.resolveEngine(view) is { } engine)
         {
@@ -300,6 +312,13 @@ public class Response
             if (get("Content-Type") is null)
                 type("application/octet-stream");
         }
+        else if (body is Uint8Array byteArray)
+        {
+            payload = string.Empty;
+            binaryPayload = byteArray.ToArray();
+            if (get("Content-Type") is null)
+                type("application/octet-stream");
+        }
         else
         {
             if (get("Content-Type") is null)
@@ -309,7 +328,7 @@ public class Response
 
         if (_context is not null)
         {
-            _context.Response.StatusCode = statusCode;
+            _context.Response.StatusCode = _statusCode;
             foreach (var header in _headers)
                 _context.Response.Headers[header.Key] = header.Value;
             if (binaryPayload is not null)
@@ -322,7 +341,7 @@ public class Response
         return this;
     }
 
-    public Response sendFile(string path, SendFileOptions? options = null, Action<Exception?>? fn = null)
+    public Response sendFile(string path, SendFileOptions? options = null, Action<Error?>? fn = null)
     {
         try
         {
@@ -335,7 +354,7 @@ public class Response
 
             if (_context is not null)
             {
-                _context.Response.StatusCode = statusCode;
+                _context.Response.StatusCode = _statusCode;
                 if (_contentTypes.TryGetContentType(resolved, out var contentType))
                     _context.Response.ContentType = contentType;
                 _context.Response.SendFileAsync(resolved).GetAwaiter().GetResult();
@@ -346,16 +365,16 @@ public class Response
         }
         catch (Exception ex)
         {
-            fn?.Invoke(ex);
+            fn?.Invoke(js_interop.fromException(ex));
         }
 
         return this;
     }
 
-    public Response sendStatus(int code)
+    public Response sendStatus(double code)
     {
         status(code);
-        return send(code.ToString());
+        return send(js_interop.toInt32(nameof(code), code).ToString());
     }
 
     public Response set(string field, object? value)
@@ -375,11 +394,9 @@ public class Response
 
     public Response header(string field, object? value) => set(field, value);
 
-    public Response status(int code)
+    public Response status(double code)
     {
         statusCode = code;
-        if (_context is not null)
-            _context.Response.StatusCode = code;
         return this;
     }
 

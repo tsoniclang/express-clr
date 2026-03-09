@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
+using Tsonic.Runtime;
 
 namespace express;
 
@@ -10,6 +11,8 @@ public class Request
     private readonly HttpContext? _context;
     private readonly HashSet<string> _acceptedLanguages = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, string> _headers = new(StringComparer.OrdinalIgnoreCase);
+    private readonly List<string> _ips = new();
+    private readonly List<string> _subdomains = new();
 
     public Application? app { get; set; }
     public string baseUrl { get; set; } = string.Empty;
@@ -21,7 +24,16 @@ public class Request
     public string host { get; set; } = string.Empty;
     public string hostname { get; set; } = string.Empty;
     public string ip { get; set; } = string.Empty;
-    public List<string> ips { get; set; } = new();
+    public string[] ips
+    {
+        get => _ips.ToArray();
+        set
+        {
+            _ips.Clear();
+            if (value is { Length: > 0 })
+                _ips.AddRange(value);
+        }
+    }
     public string method { get; set; } = "GET";
     public string originalUrl { get; set; } = "/";
     public Params @params { get; } = new();
@@ -32,7 +44,16 @@ public class Request
     public Route? route { get; set; }
     public bool signed { get; set; }
     public Cookies signedCookies { get; } = new();
-    public List<string> subdomains { get; set; } = new();
+    public string[] subdomains
+    {
+        get => _subdomains.ToArray();
+        set
+        {
+            _subdomains.Clear();
+            if (value is { Length: > 0 })
+                _subdomains.AddRange(value);
+        }
+    }
     public bool xhr { get; set; }
 
     public bool secure => string.Equals(protocol, "https", StringComparison.OrdinalIgnoreCase);
@@ -73,7 +94,7 @@ public class Request
             if (parts.Length > offset)
             {
                 for (var index = parts.Length - offset - 1; index >= 0; index--)
-                    subdomains.Add(parts[index]);
+                    _subdomains.Add(parts[index]);
             }
         }
     }
@@ -153,14 +174,15 @@ public class Request
         return types[0];
     }
 
-    public object range(long size, RangeOptions? options = null)
+    public Union<RangeResult, int> range(double size, RangeOptions? options = null)
     {
         _ = options;
         if (size <= 0)
             return -1;
 
+        var actualSize = js_interop.toInt64(nameof(size), size);
         var result = new RangeResult();
-        result.ranges.Add(new ByteRange { start = 0, end = size - 1 });
+        result.add(new ByteRange { start = 0, end = actualSize - 1 });
         return result;
     }
 

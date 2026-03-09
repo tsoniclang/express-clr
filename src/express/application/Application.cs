@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
+using Tsonic.JSRuntime;
 
 namespace express;
 
@@ -78,14 +79,15 @@ public class Application : Router
         });
     }
 
-    public AppServer listen(int port, Action? callback = null)
+    public AppServer listen(double port, Action? callback = null)
     {
+        var actualPort = js_interop.toInt32(nameof(port), port);
         var app = buildWebApplication();
-        app.Urls.Add($"http://127.0.0.1:{port}");
+        app.Urls.Add($"http://127.0.0.1:{actualPort}");
         app.Start();
         callback?.Invoke();
         var keepAlive = ProcessKeepAlive.Acquire();
-        return new AppServer(port, null, null, () =>
+        return new AppServer(actualPort, null, null, () =>
         {
             try
             {
@@ -98,14 +100,15 @@ public class Application : Router
         });
     }
 
-    public AppServer listen(int port, string host, Action? callback = null)
+    public AppServer listen(double port, string host, Action? callback = null)
     {
+        var actualPort = js_interop.toInt32(nameof(port), port);
         var app = buildWebApplication();
-        app.Urls.Add($"http://{host}:{port}");
+        app.Urls.Add($"http://{host}:{actualPort}");
         app.Start();
         callback?.Invoke();
         var keepAlive = ProcessKeepAlive.Acquire();
-        return new AppServer(port, host, null, () =>
+        return new AppServer(actualPort, host, null, () =>
         {
             try
             {
@@ -118,9 +121,9 @@ public class Application : Router
         });
     }
 
-    public AppServer listen(int port, string host, int backlog, Action? callback = null)
+    public AppServer listen(double port, string host, double backlog, Action? callback = null)
     {
-        _ = backlog;
+        _ = js_interop.toInt32(nameof(backlog), backlog);
         return listen(port, host, callback);
     }
 
@@ -135,7 +138,7 @@ public class Application : Router
         return string.Empty;
     }
 
-    public void render(string view, Action<Exception?, string?> callback)
+    public void render(string view, Action<Error?, string?> callback)
     {
         if (_engines.TryGetValue(viewExtension(view), out var engine))
         {
@@ -146,7 +149,7 @@ public class Application : Router
         callback(null, $"<rendered:{view}>");
     }
 
-    public void render(string view, Dictionary<string, object?> viewLocals, Action<Exception?, string?> callback)
+    public void render(string view, Dictionary<string, object?> viewLocals, Action<Error?, string?> callback)
     {
         if (_engines.TryGetValue(viewExtension(view), out var engine))
         {

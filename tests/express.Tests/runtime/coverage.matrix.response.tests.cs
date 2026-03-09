@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using express;
 using Microsoft.AspNetCore.Http;
+using Tsonic.JSRuntime;
 using Xunit;
 
 namespace express.Tests.runtime;
@@ -260,7 +261,7 @@ public class coverage_matrix_response_tests
             {
                 var relativeContext = test_runtime_utils.createContext("GET", "/");
                 var relativeRes = Response.fromHttpContext(relativeContext, Request.fromHttpContext(relativeContext, express.create()));
-                Exception? relativeError = null;
+                Error? relativeError = null;
                 relativeRes.sendFile(relativeName, fn: err => relativeError = err);
                 Assert.Null(relativeError);
                 Assert.Equal("R", test_runtime_utils.readBody(relativeContext));
@@ -270,26 +271,26 @@ public class coverage_matrix_response_tests
                 File.Delete(relativeName);
             }
 
-            Exception? sendError = null;
+            Error? sendError = null;
             sendRes.sendFile("missing.txt", new SendFileOptions { root = root }, err => sendError = err);
             Assert.NotNull(sendError);
 
             var downloadContext = test_runtime_utils.createContext("GET", "/");
             var downloadRes = Response.fromHttpContext(downloadContext, Request.fromHttpContext(downloadContext, express.create()));
-            Exception? downloadError = null;
+            Error? downloadError = null;
             downloadRes.download(Path.Combine(root, "b.txt"), fn: err => downloadError = err);
             Assert.Null(downloadError);
             Assert.Equal("B", test_runtime_utils.readBody(downloadContext));
 
-            Exception? downloadWithOptionsError = null;
+            Error? downloadWithOptionsError = null;
             downloadRes.download(Path.Combine(root, "b.txt"), options: new DownloadOptions { root = root }, fn: err => downloadWithOptionsError = err);
             Assert.Null(downloadWithOptionsError);
 
-            Exception? downloadMissingError = null;
+            Error? downloadMissingError = null;
             downloadRes.download(Path.Combine(root, "missing.txt"), fn: err => downloadMissingError = err);
             Assert.Null(downloadMissingError);
 
-            Exception? downloadCatchError = null;
+            Error? downloadCatchError = null;
             downloadRes.download(Path.Combine(root, "b.txt"), fn: err =>
             {
                 if (err is null)
