@@ -20,12 +20,12 @@ public class Response
 
     public Request? req { get; set; }
     public Dictionary<string, object?> locals { get; } = new(StringComparer.OrdinalIgnoreCase);
-    public double statusCode
+    public int statusCode
     {
-        get => js_interop.fromInt32(_statusCode);
+        get => _statusCode;
         set
         {
-            _statusCode = js_interop.toInt32(nameof(statusCode), value);
+            _statusCode = value;
             if (_context is not null)
                 _context.Response.StatusCode = _statusCode;
         }
@@ -232,15 +232,14 @@ public class Response
 
     public Response redirect(string path) => redirect(StatusCodes.Status302Found, path);
 
-    public Response redirect(double status, string path)
+    public Response redirect(int status, string path)
     {
-        var actualStatus = js_interop.toInt32(nameof(status), status);
-        _statusCode = actualStatus;
+        _statusCode = status;
         location(path);
         headersSent = true;
         if (_context is not null)
         {
-            _context.Response.StatusCode = actualStatus;
+            _context.Response.StatusCode = status;
             _context.Response.Headers.Location = path;
         }
 
@@ -371,10 +370,10 @@ public class Response
         return this;
     }
 
-    public Response sendStatus(double code)
+    public Response sendStatus(int code)
     {
         status(code);
-        return send(js_interop.toInt32(nameof(code), code).ToString());
+        return send(code.ToString());
     }
 
     public Response set(string field, object? value)
@@ -394,7 +393,7 @@ public class Response
 
     public Response header(string field, object? value) => set(field, value);
 
-    public Response status(double code)
+    public Response status(int code)
     {
         statusCode = code;
         return this;

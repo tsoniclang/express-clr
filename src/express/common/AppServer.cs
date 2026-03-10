@@ -8,7 +8,7 @@ public sealed class AppServer
     private readonly Action? _closeAction;
     private readonly int? _port;
 
-    public double? port => js_interop.fromInt32(_port);
+    public int? port => _port;
     public string? host { get; }
     public string? path { get; }
     public bool listening { get; private set; }

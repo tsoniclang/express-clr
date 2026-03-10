@@ -13,7 +13,7 @@ namespace express.Tests.runtime;
 public class js_surface_contract_runtime_tests
 {
     [Fact]
-    public void numeric_js_boundaries_validate_integer_backing_types()
+    public void integer_backed_js_surface_members_use_exact_numeric_contracts()
     {
         var urlencoded = new UrlEncodedOptions();
         urlencoded.parameterLimit = 32;
@@ -35,12 +35,25 @@ public class js_surface_contract_runtime_tests
         var response = new Response();
         response.statusCode = 201;
 
-        Assert.Throws<ArgumentException>(() => urlencoded.parameterLimit = 1.5);
-        Assert.Throws<ArgumentException>(() => multipartField.maxCount = 1.25);
-        Assert.Throws<ArgumentException>(() => multipartOptions.maxFileCount = 2.5);
-        Assert.Throws<ArgumentOutOfRangeException>(() => multipartOptions.maxFileSizeBytes = double.PositiveInfinity);
-        Assert.Throws<ArgumentException>(() => cors.optionsSuccessStatus = 204.5);
-        Assert.Throws<ArgumentException>(() => response.statusCode = 200.1);
+        Assert.Equal(typeof(int), typeof(UrlEncodedOptions).GetProperty(nameof(UrlEncodedOptions.parameterLimit))!.PropertyType);
+        Assert.Equal(typeof(int), typeof(UrlEncodedOptions).GetProperty(nameof(UrlEncodedOptions.depth))!.PropertyType);
+        Assert.Equal(typeof(int?), typeof(MultipartField).GetProperty(nameof(MultipartField.maxCount))!.PropertyType);
+        Assert.Equal(typeof(int?), typeof(MultipartOptions).GetProperty(nameof(MultipartOptions.maxFileCount))!.PropertyType);
+        Assert.Equal(typeof(long?), typeof(MultipartOptions).GetProperty(nameof(MultipartOptions.maxFileSizeBytes))!.PropertyType);
+        Assert.Equal(typeof(int?), typeof(CorsOptions).GetProperty(nameof(CorsOptions.maxAgeSeconds))!.PropertyType);
+        Assert.Equal(typeof(int), typeof(CorsOptions).GetProperty(nameof(CorsOptions.optionsSuccessStatus))!.PropertyType);
+        Assert.Equal(typeof(int), typeof(Response).GetProperty(nameof(Response.statusCode))!.PropertyType);
+        Assert.Equal(typeof(long), typeof(FileStat).GetProperty(nameof(FileStat.size))!.PropertyType);
+        Assert.Equal(typeof(long), typeof(UploadedFile).GetProperty(nameof(UploadedFile.size))!.PropertyType);
+
+        Assert.Equal(32, urlencoded.parameterLimit);
+        Assert.Equal(4, urlencoded.depth);
+        Assert.Equal(1, multipartField.maxCount);
+        Assert.Equal(2, multipartOptions.maxFileCount);
+        Assert.Equal(4096, multipartOptions.maxFileSizeBytes);
+        Assert.Equal(60, cors.maxAgeSeconds);
+        Assert.Equal(204, cors.optionsSuccessStatus);
+        Assert.Equal(201, response.statusCode);
     }
 
     [Fact]
