@@ -30,7 +30,7 @@ public sealed class Multipart
             .ConfigureAwait(false);
     };
 
-    public RequestHandler array(string name, double? maxCount = null) => async (req, _, next) =>
+    public RequestHandler array(string name, int? maxCount = null) => async (req, _, next) =>
     {
         await parse(req, MultipartMode.fields, new[] { new MultipartField { name = name, maxCount = maxCount } }, next)
             .ConfigureAwait(false);

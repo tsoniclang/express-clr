@@ -174,15 +174,14 @@ public class Request
         return types[0];
     }
 
-    public Union<RangeResult, int> range(double size, RangeOptions? options = null)
+    public Union<RangeResult, int> range(long size, RangeOptions? options = null)
     {
         _ = options;
         if (size <= 0)
             return -1;
 
-        var actualSize = js_interop.toInt64(nameof(size), size);
         var result = new RangeResult();
-        result.add(new ByteRange { start = 0, end = actualSize - 1 });
+        result.add(new ByteRange { start = 0, end = size - 1 });
         return result;
     }
 

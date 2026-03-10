@@ -79,15 +79,14 @@ public class Application : Router
         });
     }
 
-    public AppServer listen(double port, Action? callback = null)
+    public AppServer listen(int port, Action? callback = null)
     {
-        var actualPort = js_interop.toInt32(nameof(port), port);
         var app = buildWebApplication();
-        app.Urls.Add($"http://127.0.0.1:{actualPort}");
+        app.Urls.Add($"http://127.0.0.1:{port}");
         app.Start();
         callback?.Invoke();
         var keepAlive = ProcessKeepAlive.Acquire();
-        return new AppServer(actualPort, null, null, () =>
+        return new AppServer(port, null, null, () =>
         {
             try
             {
@@ -100,15 +99,14 @@ public class Application : Router
         });
     }
 
-    public AppServer listen(double port, string host, Action? callback = null)
+    public AppServer listen(int port, string host, Action? callback = null)
     {
-        var actualPort = js_interop.toInt32(nameof(port), port);
         var app = buildWebApplication();
-        app.Urls.Add($"http://{host}:{actualPort}");
+        app.Urls.Add($"http://{host}:{port}");
         app.Start();
         callback?.Invoke();
         var keepAlive = ProcessKeepAlive.Acquire();
-        return new AppServer(actualPort, host, null, () =>
+        return new AppServer(port, host, null, () =>
         {
             try
             {
@@ -121,9 +119,9 @@ public class Application : Router
         });
     }
 
-    public AppServer listen(double port, string host, double backlog, Action? callback = null)
+    public AppServer listen(int port, string host, int backlog, Action? callback = null)
     {
-        _ = js_interop.toInt32(nameof(backlog), backlog);
+        _ = backlog;
         return listen(port, host, callback);
     }
 

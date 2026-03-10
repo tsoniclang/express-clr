@@ -23,7 +23,7 @@ public sealed class UploadedFile
     public string fieldname { get; }
     public string originalname { get; }
     public string mimetype { get; }
-    public double size { get; }
+    public long size { get; }
 
     internal Stream openReadStream() => _file.OpenReadStream();
 
